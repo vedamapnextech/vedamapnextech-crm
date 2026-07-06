@@ -1,17 +1,17 @@
 import { MdWarningAmber } from "react-icons/md";
 
-function DeleteCustomerModal({
-    selectedCustomer,
-    setIsDeleteModalOpen,
+function DeleteProductModal({
+    selectedProduct,
+    setOpenDeleteModal,
     customers,
     setCustomers,
-    setSelectedCustomer,
-    getCustomers,
+    setSelectedProduct,
+    getProducts,
 }) {
 
     const handleDelete = () => {
 
-        fetch(`${import.meta.env.VITE_API_URL}/customers/${selectedCustomer._id}`, {
+        fetch(`${import.meta.env.VITE_API_URL}/products/${selectedProduct._id}`, {
             method: "DELETE",
 
         })
@@ -20,11 +20,11 @@ function DeleteCustomerModal({
 
                 console.log(data);
 
-                getCustomers();
+                getProducts();
 
-                setSelectedCustomer(null);
+                setSelectedProduct(null);
 
-                setIsDeleteModalOpen(false);
+                setOpenDeleteModal(false);
 
             });
 
@@ -53,11 +53,11 @@ function DeleteCustomerModal({
                 {/* Heading */}
 
                 <h2 className="mt-7 text-center text-3xl font-bold text-slate-800">
-                    Delete Customer
+                    Delete Product
                 </h2>
 
                 <p className="mt-3 text-center text-slate-500 leading-7">
-                    You are about to permanently remove this customer from your CRM.
+                    You are about to permanently remove this  product from your CRM.
                 </p>
 
                 {/* Customer Name */}
@@ -65,11 +65,11 @@ function DeleteCustomerModal({
                 <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-center shadow-sm">
 
                     <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-                        Selected Customer
+                        Selected Product
                     </p>
 
                     <h3 className="mt-2 text-xl font-bold text-slate-800">
-                        {selectedCustomer?.name}
+                        {selectedProduct?.name}
                     </h3>
 
                 </div>
@@ -90,8 +90,8 @@ function DeleteCustomerModal({
 
                     <button
                         onClick={() => {
-                            setSelectedCustomer(null);
-                            setIsDeleteModalOpen(false);
+                           
+                            setOpenDeleteModal(false);
                         }}
                         className="flex-1 rounded-2xl border border-slate-300 bg-white py-3 font-semibold text-slate-700 transition-all duration-300 hover:-translate-y-1 hover:bg-slate-100 hover:shadow-lg active:scale-95"
                     >
@@ -102,7 +102,7 @@ function DeleteCustomerModal({
                         onClick={handleDelete}
                         className="flex-1 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 py-3 font-semibold text-white shadow-lg shadow-red-500/30 transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:from-red-600 hover:to-red-700 hover:shadow-red-500/50 active:scale-95"
                     >
-                        🗑 Delete Customer
+                        🗑 Delete Product
                     </button>
 
                 </div>
@@ -113,4 +113,4 @@ function DeleteCustomerModal({
     );
 }
 
-export default DeleteCustomerModal;
+export default DeleteProductModal;

@@ -1,4 +1,9 @@
-function CustomerProfileCard({ customer }) {
+function CustomerProfileCard({
+    customer,
+    setOpenModal,
+    setSelectedCustomer,
+    setOpenProductModal,
+}) {
     console.log(customer);
     return (
         <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden">
@@ -67,10 +72,14 @@ function CustomerProfileCard({ customer }) {
 
                         </button>
 
-                        <button className="px-6 py-3 rounded-2xl bg-slate-900 hover:bg-black hover:-translate-y-1 hover:scale-105 transition-all duration-300 text-white font-semibold shadow-lg">
-
+                        <button
+                            onClick={() => {
+                                setSelectedCustomer(customer);
+                                setOpenModal(true);
+                            }}
+                            className="px-6 py-3 rounded-2xl bg-slate-900 hover:bg-black hover:-translate-y-1 hover:scale-105 transition-all duration-300 text-white font-semibold shadow-lg"
+                        >
                             ✏ Edit
-
                         </button>
 
                     </div>
@@ -132,7 +141,21 @@ function CustomerProfileCard({ customer }) {
                                 {customer.city}
                             </h3>
 
+                            <div className="rounded-2xl border border-slate-200 p-5 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+
+                                <p className="text-sm text-slate-500">
+                                    🏠 Address
+                                </p>
+
+                                <h3 className="mt-2 text-lg font-bold text-slate-800">
+                                    {customer.address}
+                                </h3>
+
+                            </div>
+
+
                         </div>
+
 
                     </div>
 
@@ -199,6 +222,167 @@ function CustomerProfileCard({ customer }) {
 
                 </div>
 
+
+
+
+                {/* Billing Information */}
+
+                {/* Customer Products */}
+
+                <div className="mt-12 border-t border-slate-200 pt-8">
+
+                    <div className="flex items-center justify-between mb-6">
+
+                        <h2 className="text-2xl font-bold text-slate-800">
+                            📦 Customer Products
+                        </h2>
+
+                        <button
+                            onClick={() => setOpenProductModal(true)}
+                            className="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition"
+                        >
+                            + Add Product
+                        </button>
+
+                    </div>
+
+                    <div className="overflow-x-auto rounded-2xl border border-slate-200">
+
+                        <table className="w-full">
+
+                            <thead className="bg-slate-100">
+
+                                <tr className="border-b border-slate-200 bg-slate-50">
+                                    <th className="text-left px-6 py-4">Date</th>
+                                    <th className="text-left px-6 py-4">Product</th>
+                                    <th className="text-center px-6 py-4">Qty</th>
+                                    <th className="text-center px-6 py-4">Unit Price</th>
+                                    <th className="text-center px-6 py-4">Total</th>
+                                    <th className="text-center px-6 py-4">Paid</th>
+                                    <th className="text-center px-6 py-4">Pending</th>
+                                    <th className="text-center px-6 py-4">Status</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                <tr className="border-b border-slate-100 hover:bg-slate-50">
+
+                                    <td className="px-6 py-4">
+                                        {customer.customerSince}
+                                    </td>
+
+                                    <td className="px-6 py-4 font-medium">
+                                        {customer.product}
+                                    </td>
+
+                                    <td className="text-center">
+                                        {customer.quantity}
+                                    </td>
+
+                                    <td className="text-center">
+                                        ₹ {customer.unitPrice}
+                                    </td>
+
+                                    <td className="text-center font-semibold text-blue-600">
+                                        ₹ {customer.totalAmount}
+                                    </td>
+
+                                    <td className="text-center font-semibold text-green-600">
+                                        ₹ {customer.paidAmount}
+                                    </td>
+
+                                    <td className="text-center font-semibold text-red-600">
+                                        ₹ {customer.pendingAmount}
+                                    </td>
+
+                                    <td className="text-center">
+                                        <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold">
+                                            {customer.paymentStatus}
+                                        </span>
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+
+                {/* Payment Summary */}
+
+                <div className="mt-10">
+
+                    <div className="rounded-3xl border border-slate-200 bg-gradient-to-r from-slate-50 to-white p-8">
+
+                        <h2 className="text-2xl font-bold text-slate-800 mb-6">
+                            💳 Payment Summary
+                        </h2>
+
+                        <div className="space-y-4">
+
+                            <div className="flex justify-between">
+
+                                <span>Total Bill</span>
+
+                                <span className="font-bold">
+                                    ₹ {customer.totalAmount?.toLocaleString()}
+                                </span>
+
+                            </div>
+
+                            <div className="flex justify-between">
+
+                                <span>Paid Amount</span>
+
+                                <span className="font-bold text-green-600">
+                                    ₹ {customer.paidAmount?.toLocaleString()}
+                                </span>
+
+                            </div>
+
+                            <div className="flex justify-between">
+
+                                <span>Pending Amount</span>
+
+                                <span className="font-bold text-red-600">
+                                    ₹ {customer.pendingAmount?.toLocaleString()}
+                                </span>
+
+                            </div>
+
+                            <hr />
+
+                            <div className="flex justify-between items-center">
+
+                                <span className="font-semibold">
+                                    Payment Status
+                                </span>
+
+                                <span
+                                    className={`px-4 py-2 rounded-full text-sm font-bold ${customer.paymentStatus === "Paid"
+                                        ? "bg-green-100 text-green-700"
+                                        : customer.paymentStatus === "Partial"
+                                            ? "bg-orange-100 text-orange-700"
+                                            : "bg-red-100 text-red-700"
+                                        }`}
+                                >
+                                    {customer.paymentStatus}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
 
             </div>

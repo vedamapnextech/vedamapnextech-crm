@@ -53,26 +53,36 @@ function Customers() {
   // },
 
   const [search, setSearch] = useState("");
-  useEffect(() => {
+  const [status, setStatus] = useState("");
+  const [city, setCity] = useState("");
 
-    fetch("http://localhost:5000/api/customers")
+  const getCustomers = (
+    searchText = "",
+    statusText = "",
+    cityText = ""
+  ) => {
+    console.log(import.meta.env.VITE_API_URL);
+    fetch(`${import.meta.env.VITE_API_URL}/customers?search=${searchText}&status=${statusText}&city=${cityText}`)
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
-        setCustomers(data);
+        setCustomers(data.reverse());
       });
+
+  };
+
+
+  useEffect(() => {
+
+    getCustomers();
 
   }, []);
   console.log("Customers State:", customers);
-  const filteredCustomers = customers.filter((customer) => {
-    return (
-      customer.name.toLowerCase().includes(search.toLowerCase()) ||
-      customer.company.toLowerCase().includes(search.toLowerCase()) ||
-      customer.city.toLowerCase().includes(search.toLowerCase()) ||
-      customer.product.toLowerCase().includes(search.toLowerCase()) ||
-      customer.phone.includes(search)
-    );
-  });
+  const activeCustomers = customers.filter(
+    (customer) => customer.status === "Active"
+  );
+  const pendingCustomers = customers.filter(
+    (customer) => customer.status === "Pending"
+  );
   return (
     <div className="space-y-10">
 
@@ -122,21 +132,21 @@ function Customers() {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mt-8 mb-8">
         <StatCard
           title="Total Customers"
-          value="1,254"
+          value={customers.length}
           icon={<MdPeople />}
           color="bg-blue-500"
         />
 
         <StatCard
           title="Active Customers"
-          value="1,180"
+          value={activeCustomers.length}
           icon={<MdCheckCircle />}
           color="bg-emerald-500"
         />
 
         <StatCard
-          title="Installation Due"
-          value="23"
+          title="Pending Customers"
+          value={pendingCustomers.length}
           icon={<MdBuild />}
           color="bg-orange-500"
         />
@@ -161,31 +171,49 @@ function Customers() {
             type="text"
             placeholder="🔍 Search customer..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+
+              setSearch(e.target.value);
+
+              getCustomers(e.target.value, status, city);
+            }}
             className="px-5 py-4 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-emerald-400 outline-none"
           />
 
-          <select className="px-5 py-4 rounded-2xl border border-slate-200">
-
-            <option>All Status</option>
-            <option>Active</option>
-            <option>Pending</option>
-
-          </select>
-
-          <select className="px-5 py-4 rounded-2xl border border-slate-200">
-
-            <option>All Cities</option>
-            <option>Jaipur</option>
-            <option>Delhi</option>
-
-          </select>
-
-          <button
-            className="rounded-2xl bg-slate-900 hover:bg-black text-white font-semibold transition"
+          <select
+            value={status}
+            onChange={(e) => {
+              setStatus(e.target.value);
+              getCustomers(search, e.target.value, city);
+            }}
+            className="px-5 py-4 rounded-2xl border border-slate-200"
           >
-            Search
-          </button>
+            <option value="">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Pending">Pending</option>
+
+          </select>
+
+          <select
+            value={city}
+            onChange={(e) => {
+
+              setCity(e.target.value);
+
+              getCustomers(search, status, e.target.value);
+
+            }}
+            className="px-5 py-4 rounded-2xl border border-slate-200"
+          >
+
+            <option value="">All Cities</option>
+            <option value="Jaipur">Jaipur</option>
+            <option value="Delhi">Delhi</option>
+            <option value="Ajmer">Ajmer</option>
+
+          </select>
+
+
 
         </div>
 
@@ -215,10 +243,10 @@ function Customers() {
 
             <tbody>
 
-              {filteredCustomers.map((customer) => (
+              {customers.map((customer) => (
 
                 <tr
-                  key={customer.id}
+                  key={customer._id}
                   className="border-t border-slate-200 hover:bg-slate-50 transition-all duration-200"                >
 
                   <td className="px-6 py-5">
@@ -238,7 +266,7 @@ function Customers() {
                         </h3>
 
                         <p className="text-xs text-slate-500">
-                          Customer ID #{customer.id}
+                          Customer ID #{customer._id.slice(-6)}
                         </p>
 
                       </div>
@@ -279,7 +307,7 @@ function Customers() {
 
                     <div className="flex gap-2">
 
-                      <button onClick={() => navigate(`/customer/${customer.id}`)} className="px-3 py-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition">
+                      <button onClick={() => navigate(`/customer/${customer._id}`)} className="px-3 py-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition">
                         View
                       </button>
 
@@ -318,14 +346,18 @@ function Customers() {
         setCustomers={setCustomers}
         selectedCustomer={selectedCustomer}
         setSelectedCustomer={setSelectedCustomer}
+        getCustomers={getCustomers}
       />)}
       {isDeleteModalOpen && (
         <DeleteCustomerModal selectedCustomer={selectedCustomer}
           setSelectedCustomer={setSelectedCustomer}
-          isDeleteModalOpen={isDeleteModalOpen}
+
           setIsDeleteModalOpen={setIsDeleteModalOpen}
           customers={customers}
-          setCustomers={setCustomers} />
+          setCustomers={setCustomers}
+          getCustomers={getCustomers}
+        />
+
       )}
 
     </div>

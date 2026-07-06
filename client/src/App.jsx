@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import ProductDetails from "./pages/Products/ProductDetails";
 
 import DashboardLayout from "./Layouts/DashboardLayout";
 
@@ -12,6 +13,7 @@ import Installations from "./pages/Installations/Installations";
 import Support from "./pages/Support/Support";
 import Reports from "./pages/Reports/Reports";
 import Settings from "./pages/Settings/Settings";
+import InstallationDetails from "./pages/Installations/InstallationDetails";
 
 function App() {
   return (
@@ -27,7 +29,9 @@ function App() {
         <Route path="/customers" element={<Customers />} />
         <Route path="/customer/:id" element={<CustomerDetails />} />
         <Route path="/products" element={<Products />} />
+        <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/installations" element={<Installations />} />
+        <Route path="/installations/:id" element={<InstallationDetails />} />
         <Route path="/support" element={<Support />} />
         <Route path="/employees" element={<Employees />} />
         <Route path="/reports" element={<Reports />} />

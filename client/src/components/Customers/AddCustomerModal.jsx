@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
-function AddCustomerModal({ setOpenModal, customers,
-    setCustomers, selectedCustomer, setSelectedCustomer, }) {
+function AddCustomerModal({
+    setOpenModal,
+    customers,
+    setCustomers,
+    selectedCustomer,
+    setSelectedCustomer,
+    getCustomers,
+}) {
     const [formData, setFormData] = useState({
         name: "",
         phone: "",
@@ -9,22 +15,50 @@ function AddCustomerModal({ setOpenModal, customers,
         email: "",
         product: "",
         address: "",
+
+        quantity: 1,
+        unitPrice: "",
+        totalAmount: "",
+        paidAmount: "",
+        pendingAmount: "",
+        paymentStatus: "Pending",
+        customerSince: new Date().toISOString().split("T")[0],
     });
     useEffect(() => {
         if (selectedCustomer) {
             setFormData(selectedCustomer);
         }
     }, [selectedCustomer]);
+
+
     const handleChange = (e) => {
+        const { name, value } = e.target;
 
-        setFormData({
+        const updatedData = {
             ...formData,
+            [name]: value,
+        };
 
-            [e.target.name]: e.target.value,
+        const quantity = Number(updatedData.quantity) || 0;
+        const unitPrice = Number(updatedData.unitPrice) || 0;
+        const paidAmount = Number(updatedData.paidAmount) || 0;
 
-        });
-
+        updatedData.totalAmount = quantity * unitPrice;
+        updatedData.pendingAmount = Math.max(
+            updatedData.totalAmount - paidAmount,
+            0
+        );
+        if (updatedData.pendingAmount === 0) {
+            updatedData.paymentStatus = "Paid";
+        } else if (paidAmount > 0) {
+            updatedData.paymentStatus = "Partial";
+        } else {
+            updatedData.paymentStatus = "Pending";
+        }
+        setFormData(updatedData);
     };
+
+
     const handleSubmit = () => {
         if (
             formData.name.trim() === "" ||
@@ -34,52 +68,128 @@ function AddCustomerModal({ setOpenModal, customers,
             return;
         }
         if (selectedCustomer) {
-            setCustomers(
-                customers.map((customer) => {
-                    if (customer.id === selectedCustomer.id) {
-                        return {
-                            ...customer,
-                            ...formData,
-                        };
-                    }
 
-                    return customer;
-                })
-            );
-            setOpenModal(false);
-            setSelectedCustomer(null);
+            fetch(`${import.meta.env.VITE_API_URL}/customers/${selectedCustomer._id}`, {
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json",
+                },
+
+                body: JSON.stringify(formData),
+            })
+                .then((res) => res.json())
+                .then((data) => {
+
+                    console.log(data);
+
+                    getCustomers();
+
+                    setFormData({
+                        name: "",
+                        phone: "",
+                        company: "",
+                        city: "",
+                        email: "",
+                        product: "",
+                        address: "",
+
+
+                        quantity: 1,
+                        unitPrice: "",
+                        totalAmount: "",
+                        paidAmount: "",
+                        pendingAmount: "",
+                        paymentStatus: "Pending",
+                        customerSince: new Date().toISOString().split("T")[0],
+                    });
+
+                    setSelectedCustomer(null);
+
+                    setOpenModal(false);
+
+                });
+
             return;
         }
-        const newCustomer = {
-            id: customers.length + 1,
-            ...formData,
-            status: "Active",
-        };
-        setCustomers([...customers, newCustomer]);
-        setFormData({
-            name: "",
-            phone: "",
-            company: "",
-            city: "",
-            email: "",
-            product: "",
-            address: "",
-        });
-        setSelectedCustomer(null);
-        setOpenModal(false);
+        // const newCustomer = {
+        //     id: customers.length + 1,
+        //     ...formData,
+        //     status: "Active",
+        // };
+        // setCustomers([...customers, newCustomer]);
+        // setFormData({
+        //     name: "",
+        //     phone: "",
+        //     company: "",
+        //     city: "",
+        //     email: "",
+        //     product: "",
+        //     address: "",
+        // });
+        // setSelectedCustomer(null);
+        // setOpenModal(false);
+
+        fetch(`${import.meta.env.VITE_API_URL}/customers`, {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+            },
+
+            body: JSON.stringify(formData),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data);
+
+                getCustomers();
+
+                setFormData({
+                    name: "",
+                    phone: "",
+                    company: "",
+                    city: "",
+                    email: "",
+                    product: "",
+                    address: "",
+
+                    quantity: 1,
+                    unitPrice: "",
+                    totalAmount: "",
+                    paidAmount: "",
+                    pendingAmount: "",
+                    paymentStatus: "Pending",
+                    customerSince: new Date().toISOString().split("T")[0],
+
+                });
+
+                setSelectedCustomer(null);
+
+                setOpenModal(false);
+            });
+
     };
     return (
 
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="w-full max-w-xl bg-white rounded-3xl shadow-2xl p-6">
-                <h2 className="text-2xl font-bold text-slate-800 leading-tight">
+            <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl p-6"> <div
+                className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl p-6"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                        handleSubmit();
+                    }
+                }}
+            ></div>               
+            <h2 className="text-2xl font-bold text-slate-800 leading-tight">
                     {selectedCustomer ? "Edit Customer" : "Add New Customer"}
                 </h2>
 
                 <p className="text-slate-500 mt-2">
                     Fill customer details below.
                 </p>
-                <div className="grid md:grid-cols-2 grid-cols-1 gap-5 mt-5">
+                <div className="grid md:grid-cols-2 grid-cols-1 gap-4 mt-4">
 
                     <input
                         type="text"
@@ -132,6 +242,65 @@ function AddCustomerModal({ setOpenModal, customers,
                         onChange={handleChange}
                         className="border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500"
                     />
+
+
+                    <input
+                        type="number"
+                        name="quantity"
+                        placeholder="Quantity"
+                        value={formData.quantity}
+                        onChange={handleChange}
+                        className="border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+
+                    <input
+                        type="number"
+                        name="unitPrice"
+                        placeholder="Unit Price"
+                        value={formData.unitPrice}
+                        onChange={handleChange}
+                        className="border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+
+                    <input
+                        type="number"
+                        name="paidAmount"
+                        placeholder="Paid Amount"
+                        value={formData.paidAmount}
+                        onChange={handleChange}
+                        className="border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+
+                    <input
+                        type="number"
+                        value={formData.totalAmount}
+                        readOnly
+                        placeholder="Total Amount"
+                        className="border border-slate-300 rounded-xl px-4 py-3 bg-slate-100"
+                    />
+
+                    <input
+                        type="number"
+                        value={formData.pendingAmount}
+                        readOnly
+                        placeholder="Pending Amount"
+                        className="border border-slate-300 rounded-xl px-4 py-3 bg-slate-100"
+                    />
+
+                    <select
+                        name="paymentStatus"
+                        value={formData.paymentStatus}
+                        onChange={handleChange}
+                        className="border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                        <option value="Pending">Pending</option>
+                        <option value="Partial">Partial</option>
+                        <option value="Paid">Paid</option>
+                    </select>
+
+
+
+
                 </div>
 
 
@@ -140,8 +309,7 @@ function AddCustomerModal({ setOpenModal, customers,
                     placeholder="Customer Address"
                     value={formData.address}
                     onChange={handleChange}
-                    className="w-full mt-5 border border-slate-300 rounded-xl px-4 py-3 h-24 outline-none focus:ring-2 focus:ring-emerald-500"
-                />
+                    className="w-full mt-4 border border-slate-300 rounded-xl px-4 py-3 h-20 resize-none outline-none focus:ring-2 focus:ring-emerald-500" />
                 <div className="flex justify-end gap-4 mt-5">
 
                     <button onClick={() => {

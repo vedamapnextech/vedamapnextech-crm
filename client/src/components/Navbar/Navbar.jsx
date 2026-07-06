@@ -1,9 +1,60 @@
+import { useLocation, useParams } from "react-router-dom";
 import {
   HiOutlineBell,
   HiOutlineMagnifyingGlass,
 } from "react-icons/hi2";
 
 const Navbar = () => {
+  const location = useLocation();
+  const { id } = useParams();
+
+  let title = "Dashboard";
+  let subtitle = "Welcome back 👋 Mayank";
+
+  if (location.pathname === "/customers") {
+    title = "Customers";
+    subtitle = "Manage all customers";
+  }
+
+  if (location.pathname.startsWith("/customer/")) {
+    title = "Customer Details";
+    subtitle = `Customer ID #${id}`;
+  }
+
+  if (location.pathname === "/products") {
+    title = "Products";
+    subtitle = "Manage all products";
+  }
+
+  if (location.pathname.startsWith("/products/")) {
+    title = "Product Details";
+    subtitle = `Product ID #${id.slice(-6)}`;
+  }
+
+  if (location.pathname === "/installations") {
+    title = "Installations";
+    subtitle = "Manage installation records";
+  }
+
+  if (location.pathname.startsWith("/installations/")) {
+    title = "Installation Details";
+    subtitle = `Installation ID #${id.slice(-6)}`;
+  }
+
+  if (location.pathname === "/support") {
+    title = "Support";
+    subtitle = "Manage customer support";
+  }
+
+  if (location.pathname === "/reports") {
+    title = "Reports";
+    subtitle = "Business reports";
+  }
+
+  if (location.pathname === "/settings") {
+    title = "Settings";
+    subtitle = "Application settings";
+  }
   return (
     <div className="flex items-center justify-between w-full">
 
@@ -12,11 +63,11 @@ const Navbar = () => {
       <div>
 
         <h1 className="text-3xl font-bold text-slate-800">
-          Dashboard
+          {title}
         </h1>
 
         <p className="text-sm text-slate-500 mt-1">
-          Welcome back 👋 Mayank
+          {subtitle}
         </p>
 
       </div>
