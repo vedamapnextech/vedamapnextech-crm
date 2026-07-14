@@ -1,13 +1,14 @@
 import { FiAlertTriangle } from "react-icons/fi";
 
-function DeleteConfirmationModal({
 
+function DeleteConfirmationModal({
     open,
     title,
     message,
     onClose,
     onDelete,
-
+    buttonText = "Delete",
+    buttonColor = "bg-red-600 hover:bg-red-700",
 }) {
 
     if (!open) return null;
@@ -51,15 +52,10 @@ function DeleteConfirmationModal({
                     </button>
 
                     <button
-
                         onClick={onDelete}
-
-                        className="flex-1 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 py-3 font-semibold text-white shadow-lg hover:scale-105 duration-300"
-
+                        className={`rounded-2xl px-8 py-4 font-semibold text-white transition ${buttonColor}`}
                     >
-
-                        Delete
-
+                        {buttonText}
                     </button>
 
                 </div>

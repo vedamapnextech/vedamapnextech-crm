@@ -14,6 +14,33 @@ const installationSchema = new mongoose.Schema(
       required: true,
     },
 
+    wbCode: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+
+    assetId: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+
+    siteName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    installationType: {
+      type: String,
+      enum: ["New Installation", "Replacement", "Upgrade", "Reinstallation"],
+      default: "New Installation",
+    },
+
+
     location: {
       type: String,
       required: true,
@@ -29,9 +56,19 @@ const installationSchema = new mongoose.Schema(
       required: true,
     },
 
+    commissioningDate: {
+      type: Date,
+    },
+
     status: {
       type: String,
-      enum: ["Pending", "Completed", "Cancelled"],
+      enum: [
+        "Pending",
+        "In Progress",
+        "Completed",
+        "On Hold",
+        "Cancelled",
+      ],
       default: "Pending",
     },
 

@@ -8,11 +8,14 @@ const {
     addInstallation,
     updateInstallation,
     deleteInstallation,
+    getCustomerInstallations,
 } = require("../controllers/installationController");
 
 // ==================== Routes ====================a
 
 router.get("/", getInstallations);
+
+router.get("/customer/:customerId", getCustomerInstallations);
 
 router.get("/:id", getInstallationById);
 

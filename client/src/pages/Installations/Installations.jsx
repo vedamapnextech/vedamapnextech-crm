@@ -138,7 +138,13 @@ function Installations() {
 
       installation.engineer?.toLowerCase().includes(searchText) ||
 
-      installation.location?.toLowerCase().includes(searchText);
+      installation.location?.toLowerCase().includes(searchText) ||
+
+      installation.siteName?.toLowerCase().includes(searchText) ||
+
+      installation.wbCode?.toLowerCase().includes(searchText) ||
+
+      installation.assetId?.toLowerCase().includes(searchText);
 
     const matchCustomer =
 
@@ -281,7 +287,9 @@ function Installations() {
           >
             <option value="">All Status</option>
             <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
             <option value="Completed">Completed</option>
+            <option value="On Hold">On Hold</option>
             <option value="Cancelled">Cancelled</option>
           </select>
 

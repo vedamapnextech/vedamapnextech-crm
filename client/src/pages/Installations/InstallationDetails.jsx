@@ -225,11 +225,27 @@ function InstallationDetails() {
                 />
 
                 <InfoCard
+                    icon={<FiCheckCircle className="text-emerald-600" />}
+                    title="WB Code"
+                    value={installation.wbCode}
+                    subTitle="Weighbridge Code"
+                    iconBg="bg-emerald-100"
+                />
+
+                <InfoCard
                     icon={<FiPackage className="text-violet-600" />}
                     title="Product"
                     value={installation.product?.name}
                     subTitle={installation.product?.category}
                     iconBg="bg-violet-100"
+                />
+
+                <InfoCard
+                    icon={<FiPackage className="text-indigo-600" />}
+                    title="Asset ID"
+                    value={installation.assetId}
+                    subTitle="Asset Identification"
+                    iconBg="bg-indigo-100"
                 />
 
                 <InfoCard
@@ -240,12 +256,31 @@ function InstallationDetails() {
                     iconBg="bg-orange-100"
                 />
 
+
                 <InfoCard
+                    icon={<FiMapPin className="text-pink-600" />}
+                    title="Site Name"
+                    value={installation.siteName}
+                    subTitle="Customer Site"
+                    iconBg="bg-pink-100"
+                />
+
+                <InfoCard
+                
                     icon={<FiTool className="text-sky-600" />}
                     title="Assigned Engineer"
                     value={installation.engineer}
                     subTitle="Installation Engineer"
                     iconBg="bg-sky-100"
+                />
+
+
+                <InfoCard
+                    icon={<FiTool className="text-cyan-600" />}
+                    title="Installation Type"
+                    value={installation.installationType}
+                    subTitle="Installation Category"
+                    iconBg="bg-cyan-100"
                 />
 
                 <InfoCard
@@ -257,6 +292,20 @@ function InstallationDetails() {
                     subTitle="Scheduled Date"
                     iconBg="bg-emerald-100"
                 />
+
+
+                <InfoCard
+                    icon={<FiCalendar className="text-green-600" />}
+                    title="Commissioning Date"
+                    value={
+                        installation.commissioningDate
+                            ? new Date(installation.commissioningDate).toLocaleDateString()
+                            : "-"
+                    }
+                    subTitle="Go Live Date"
+                    iconBg="bg-green-100"
+                />
+
 
                 <InfoCard
                     icon={<FiClock className="text-slate-600" />}
@@ -374,7 +423,15 @@ function InstallationDetails() {
 
                     products={products}
 
-                    getInstallations={() => window.location.reload()}
+                    getInstallations={async () => {
+                        const res = await fetch(
+                            `${import.meta.env.VITE_API_URL}/installations/${id}`
+                        );
+
+                        const data = await res.json();
+
+                        setInstallation(data);
+                    }}
                     selectedInstallation={installation}
                 />
             )}

@@ -70,6 +70,28 @@ const addInstallation = async (req, res) => {
 
     try {
 
+
+
+        const existingWB = await Installation.findOne({
+            wbCode: req.body.wbCode,
+        });
+
+        if (existingWB) {
+            return res.status(400).json({
+                message: "WB Code already exists.",
+            });
+        }
+
+        const existingAsset = await Installation.findOne({
+            assetId: req.body.assetId,
+        });
+
+        if (existingAsset) {
+            return res.status(400).json({
+                message: "Asset ID already exists.",
+            });
+        }
+
         const installation = await Installation.create(req.body);
 
         res.status(201).json(installation);
@@ -96,6 +118,31 @@ const addInstallation = async (req, res) => {
 const updateInstallation = async (req, res) => {
 
     try {
+
+
+        const existingWB = await Installation.findOne({
+            wbCode: req.body.wbCode,
+            _id: { $ne: req.params.id },
+        });
+
+        if (existingWB) {
+            return res.status(400).json({
+                message: "WB Code already exists.",
+            });
+        }
+
+        const existingAsset = await Installation.findOne({
+            assetId: req.body.assetId,
+            _id: { $ne: req.params.id },
+        });
+
+        if (existingAsset) {
+            return res.status(400).json({
+                message: "Asset ID already exists.",
+            });
+        }
+
+
 
         const installation = await Installation.findByIdAndUpdate(
 
@@ -180,6 +227,27 @@ const deleteInstallation = async (req, res) => {
 
 };
 
+const getCustomerInstallations = async (req, res) => {
+    try {
+
+        const installations = await Installation.find({
+            customer: req.params.customerId,
+        }).sort({ createdAt: -1 });
+
+        res.json(installations);
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+            message: "Server Error",
+        });
+
+    }
+};
+
+
 
 module.exports = {
     getInstallations,
@@ -187,4 +255,5 @@ module.exports = {
     addInstallation,
     updateInstallation,
     deleteInstallation,
+    getCustomerInstallations,
 };

@@ -15,17 +15,29 @@ function AddInstallationModal({
 
         product: "",
 
+        wbCode: "",
+
+        assetId: "",
+
+        siteName: "",
+
+        installationType: "New Installation",
+
         location: "",
 
         engineer: "",
 
         installationDate: "",
 
+        commissioningDate: "",
+
         status: "Pending",
 
         remarks: "",
 
     });
+
+    const [loading, setLoading] = useState(false);
 
 
 
@@ -38,6 +50,11 @@ function AddInstallationModal({
                 customer: selectedInstallation.customer?._id || "",
 
                 product: selectedInstallation.product?._id || "",
+                wbCode: selectedInstallation.wbCode || "",
+                assetId: selectedInstallation.assetId || "",
+                siteName: selectedInstallation.siteName || "",
+                installationType: selectedInstallation.installationType || "New Installation",
+
 
                 location: selectedInstallation.location || "",
 
@@ -45,6 +62,10 @@ function AddInstallationModal({
 
                 installationDate: selectedInstallation.installationDate
                     ? selectedInstallation.installationDate.substring(0, 10)
+                    : "",
+
+                commissioningDate: selectedInstallation.commissioningDate
+                    ? selectedInstallation.commissioningDate.substring(0, 10)
                     : "",
 
                 status: selectedInstallation.status || "Pending",
@@ -60,17 +81,54 @@ function AddInstallationModal({
 
 
 
+
+    const engineerOptions = [
+        { value: "Govind Choudhary", label: "Govind Choudhary" },
+        { value: "Rahul Sharma", label: "Rahul Sharma" },
+        { value: "Amit Singh", label: "Amit Singh" },
+        { value: "Rakesh Kumar", label: "Rakesh Kumar" },
+    ];
+
+
+
+
     const handleChange = (e) => {
 
+        let { name, value } = e.target;
+
+        if (name === "wbCode" || name === "assetId") {
+            value = value.toUpperCase().trim();
+        }
+
         setInstallationData({
-
             ...installationData,
-
-            [e.target.name]: e.target.value,
-
+            [name]: value,
         });
 
     };
+
+
+
+
+
+    const resetForm = () => {
+        setInstallationData({
+            customer: "",
+            product: "",
+            wbCode: "",
+            assetId: "",
+            siteName: "",
+            installationType: "New Installation",
+            location: "",
+            engineer: "",
+            installationDate: "",
+            commissioningDate: "",
+            status: "Pending",
+            remarks: "",
+        });
+    };
+
+
 
 
 
@@ -81,14 +139,43 @@ function AddInstallationModal({
             !installationData.product ||
             !installationData.location.trim() ||
             !installationData.engineer.trim() ||
+            !installationData.wbCode.trim() ||
+            !installationData.assetId.trim() ||
+            !installationData.siteName.trim() ||
+            !installationData.installationType.trim() ||
             !installationData.installationDate
         ) {
 
             toast.error("Please fill all required fields.");
-
             return;
 
         }
+
+
+        if (
+            installationData.commissioningDate &&
+            new Date(installationData.commissioningDate) <
+            new Date(installationData.installationDate)
+        ) {
+
+            toast.error(
+                "Commissioning Date cannot be earlier than Installation Date."
+            );
+            return;
+
+        }
+
+        const payload = {
+            ...installationData,
+            wbCode: installationData.wbCode.trim(),
+            assetId: installationData.assetId.trim(),
+            siteName: installationData.siteName.trim(),
+            location: installationData.location.trim(),
+            engineer: installationData.engineer.trim(),
+            remarks: installationData.remarks.trim(),
+        };
+
+        setLoading(true);
 
         try {
 
@@ -108,30 +195,48 @@ function AddInstallationModal({
 
                 },
 
-                body: JSON.stringify(installationData),
+                body: JSON.stringify(payload),
 
             });
 
             const data = await response.json();
+            if (!response.ok) {
+                toast.error(data.message || "Something went wrong.");
+                return;
+            }
 
             console.log(data);
 
-            await getInstallations();
-
             if (selectedInstallation) {
+
                 toast.success("Installation updated successfully.");
-            } else {
-                toast.success("Installation added successfully.");
+
+                resetForm();
+                setOpenModal(false);
+
+                await getInstallations();
+
+                return;
             }
 
+            toast.success("Installation added successfully.");
+
+            resetForm();
             setOpenModal(false);
+
+            await getInstallations();
         }
 
         catch (error) {
 
             console.log(error);
             toast.error("Something went wrong.");
+            setLoading(false);
 
+        }
+
+        finally {
+            setLoading(false);
         }
 
     };
@@ -156,14 +261,19 @@ function AddInstallationModal({
                         </h2>
 
                         <p className="mt-2 text-slate-500">
-                            Create a new installation for customer.
+                            {selectedInstallation
+                                ? "Update installation details."
+                                : "Create a new installation for customer."}
                         </p>
 
                     </div>
 
                     <button
 
-                        onClick={() => setOpenModal(false)}
+                        onClick={() => {
+                            resetForm();
+                            setOpenModal(false);
+                        }}
 
                         className="h-12 w-12 rounded-xl bg-slate-100 text-2xl hover:bg-red-500 hover:text-white duration-300"
 
@@ -268,6 +378,78 @@ function AddInstallationModal({
 
                         </div>
 
+
+                        <div>
+                            <label className="mb-2 block text-sm font-semibold text-slate-700">
+                                WB Code
+                            </label>
+
+                            <input
+                                type="text"
+                                name="wbCode"
+                                value={installationData.wbCode}
+                                onChange={handleChange}
+                                placeholder="WB-0001"
+                                className="w-full rounded-xl border border-slate-300 p-3 outline-none focus:border-emerald-500"
+                            />
+                        </div>
+
+
+
+                        <div>
+                            <label className="mb-2 block text-sm font-semibold text-slate-700">
+                                Asset ID
+                            </label>
+
+                            <input
+                                type="text"
+                                name="assetId"
+                                value={installationData.assetId}
+                                onChange={handleChange}
+                                placeholder="AST-0001"
+                                className="w-full rounded-xl border border-slate-300 p-3 outline-none focus:border-emerald-500"
+                            />
+                        </div>
+
+
+
+                        <div>
+                            <label className="mb-2 block text-sm font-semibold text-slate-700">
+                                Site Name
+                            </label>
+
+                            <input
+                                type="text"
+                                name="siteName"
+                                value={installationData.siteName}
+                                onChange={handleChange}
+                                placeholder="Jaipur Plant"
+                                className="w-full rounded-xl border border-slate-300 p-3 outline-none focus:border-emerald-500"
+                            />
+                        </div>
+
+
+
+                        <div>
+                            <label className="mb-2 block text-sm font-semibold text-slate-700">
+                                Installation Type
+                            </label>
+
+                            <select
+                                name="installationType"
+                                value={installationData.installationType}
+                                onChange={handleChange}
+                                className="w-full rounded-xl border border-slate-300 p-3 outline-none focus:border-emerald-500"
+                            >
+                                <option value="New Installation">New Installation</option>
+                                <option value="Replacement">Replacement</option>
+                                <option value="Upgrade">Upgrade</option>
+                                <option value="Reinstallation">Reinstallation</option>
+                            </select>
+                        </div>
+
+
+
                         {/* Installation Location */}
 
                         <div>
@@ -296,14 +478,22 @@ function AddInstallationModal({
                                 Engineer
                             </label>
 
-                            <input
-                                required
-                                type="text"
-                                name="engineer"
-                                value={installationData.engineer}
-                                onChange={handleChange}
-                                placeholder="Engineer Name"
-                                className="w-full rounded-xl border border-slate-300 p-3 outline-none focus:border-emerald-500"
+                            <Select
+                                options={engineerOptions}
+                                value={
+                                    engineerOptions.find(
+                                        (option) => option.value === installationData.engineer
+                                    ) || null
+                                }
+                                onChange={(selectedOption) =>
+                                    setInstallationData({
+                                        ...installationData,
+                                        engineer: selectedOption?.value || "",
+                                    })
+                                }
+                                placeholder="Select Engineer"
+                                isSearchable
+                                className="text-sm"
                             />
 
                         </div>
@@ -327,6 +517,21 @@ function AddInstallationModal({
 
                         </div>
 
+
+                        <div>
+                            <label className="mb-2 block text-sm font-semibold text-slate-700">
+                                Commissioning Date
+                            </label>
+
+                            <input
+                                type="date"
+                                name="commissioningDate"
+                                value={installationData.commissioningDate}
+                                onChange={handleChange}
+                                className="w-full rounded-xl border border-slate-300 p-3 outline-none focus:border-emerald-500"
+                            />
+                        </div>
+
                         {/* Status */}
 
                         <div>
@@ -344,7 +549,9 @@ function AddInstallationModal({
                                 className="w-full rounded-xl border border-slate-300 p-3 outline-none focus:border-emerald-500"
                             >
                                 <option value="Pending">Pending</option>
+                                <option value="In Progress">In Progress</option>
                                 <option value="Completed">Completed</option>
+                                <option value="On Hold">On Hold</option>
                                 <option value="Cancelled">Cancelled</option>
                             </select>
 
@@ -377,7 +584,10 @@ function AddInstallationModal({
 
                         <button
                             type="button"
-                            onClick={() => setOpenModal(false)}
+                            onClick={() => {
+                                resetForm();
+                                setOpenModal(false);
+                            }}
                             className="rounded-xl border border-slate-300 px-6 py-3 font-semibold"
                         >
                             Cancel
@@ -385,11 +595,14 @@ function AddInstallationModal({
 
                         <button
                             type="submit"
+                            disabled={loading}
                             className="rounded-xl bg-emerald-500 px-6 py-3 font-semibold text-white hover:bg-emerald-600"
                         >
-                            {selectedInstallation
-                                ? "Update Installation"
-                                : "Save Installation"}
+                            {loading
+                                ? "Saving..."
+                                : selectedInstallation
+                                    ? "Update Installation"
+                                    : "Save Installation"}
                         </button>
                     </div>
 

@@ -4,6 +4,7 @@ import {
     FiTrash2,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { formatDate } from "../../utils/formatters";
 function InstallationTable({
     installations,
     setOpenModal,
@@ -23,7 +24,13 @@ function InstallationTable({
 
                         <th className="px-6 py-5 text-left">Customer</th>
 
+                        <th className="px-6 py-5 text-left">WB Code</th>
+
+                        <th className="px-6 py-5 text-left">Asset ID</th>
+
                         <th className="px-6 py-5 text-left">Site</th>
+
+                        <th className="px-6 py-5 text-left">Type</th>
 
                         <th className="px-6 py-5 text-left">Product</th>
 
@@ -80,8 +87,20 @@ function InstallationTable({
                                     {installation.customer?.name}
                                 </td>
 
+                                <td className="px-6 py-5 font-semibold text-emerald-600">
+                                    {installation.wbCode || "-"}
+                                </td>
+
+                                <td className="px-6 py-5">
+                                    {installation.assetId || "-"}
+                                </td>
+
                                 <td className="px-6 py-5">
                                     {installation.location || "-"}
+                                </td>
+
+                                <td className="px-6 py-5">
+                                    {installation.installationType || "-"}
                                 </td>
 
                                 <td className="px-6 py-5">
@@ -93,23 +112,24 @@ function InstallationTable({
                                 </td>
 
                                 <td className="px-6 py-5">
-                                    {new Date(installation.installationDate).toLocaleDateString()}
+                                    {formatDate(installation.installationDate)}
                                 </td>
 
                                 <td className="px-6 py-5">
                                     <span
                                         className={`rounded-full px-4 py-2 text-sm font-semibold
-    ${installation.status === "Completed"
+                                       ${installation.status === "Completed"
                                                 ? "bg-emerald-100 text-emerald-700"
                                                 : installation.status === "Pending"
                                                     ? "bg-orange-100 text-orange-700"
-                                                    : "bg-red-100 text-red-700"
+                                                    : installation.status === "In Progress"
+                                                        ? "bg-blue-100 text-blue-700" : installation.status === "On Hold"
+                                                            ? "bg-purple-100 text-purple-700"
+                                                            : "bg-red-100 text-red-700"
                                             }`}
                                     >
                                         {installation.status}
                                     </span>
-
-
 
 
 

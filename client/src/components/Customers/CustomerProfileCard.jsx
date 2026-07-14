@@ -1,10 +1,57 @@
+import exportCustomerPDF from "../../utils/exportCustomerPDF";
 function CustomerProfileCard({
     customer,
+    products,
+    getProducts,
     setOpenModal,
     setSelectedCustomer,
     setOpenProductModal,
+    setIsDeleteModalOpen,
+    selectedProduct,
+    setSelectedProduct,
+    installations,
 }) {
+
     console.log(customer);
+
+    // Payment Summary
+    const totalAmount = products.reduce(
+        (sum, product) => sum + Number(product.totalAmount || 0),
+        0
+    );
+
+    const paidAmount = products.reduce(
+        (sum, product) => sum + Number(product.paidAmount || 0),
+        0
+    );
+
+    const pendingAmount = products.reduce(
+        (sum, product) => sum + Number(product.pendingAmount || 0),
+        0
+    );
+
+    const paymentStatus =
+        pendingAmount === 0
+            ? "Paid"
+            : paidAmount === 0
+                ? "Pending"
+                : "Partial";
+
+
+    const customerSince = new Date(
+        customer.customerSince
+    ).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+
+
+    const totalProducts = products.length;
+    const totalBusiness = totalAmount;
+    const totalInstallations = installations.length;
+
+
     return (
         <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden">
 
@@ -43,8 +90,13 @@ function CustomerProfileCard({
 
                             <div className="flex gap-3 mt-5">
 
-                                <span className="px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-700 font-semibold text-sm">
-                                    🟢 Active Customer
+                                <span
+                                    className={`px-4 py-1.5 rounded-full font-semibold text-sm ${customer.status === "Active"
+                                        ? "bg-emerald-100 text-emerald-700"
+                                        : "bg-red-100 text-red-700"
+                                        }`}
+                                >
+                                    {customer.status}
                                 </span>
 
                             </div>
@@ -80,6 +132,23 @@ function CustomerProfileCard({
                             className="px-6 py-3 rounded-2xl bg-slate-900 hover:bg-black hover:-translate-y-1 hover:scale-105 transition-all duration-300 text-white font-semibold shadow-lg"
                         >
                             ✏ Edit
+                        </button>
+
+                        <button
+                            onClick={() => exportCustomerPDF(customer, products)}
+                            className="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 hover:-translate-y-1 hover:scale-105 transition-all duration-300 text-white font-semibold shadow-lg"
+                        >
+                            📄 PDF
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                setSelectedCustomer(customer);
+                                setIsDeleteModalOpen(true);
+                            }}
+                            className="px-6 py-3 rounded-2xl bg-red-500 hover:bg-red-600 hover:-translate-y-1 hover:scale-105 transition-all duration-300 text-white font-semibold shadow-lg shadow-red-500/30"
+                        >
+                            🗑 Delete
                         </button>
 
                     </div>
@@ -173,11 +242,11 @@ function CustomerProfileCard({
                         <div className="rounded-2xl bg-gradient-to-br from-emerald-50 to-white border border-emerald-200 p-6 hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
 
                             <p className="text-sm text-slate-500">
-                                Installations
+                                Products
                             </p>
 
                             <h2 className="text-3xl font-bold text-emerald-600 mt-2">
-                                08
+                                {totalProducts}
                             </h2>
 
                         </div>
@@ -185,11 +254,11 @@ function CustomerProfileCard({
                         <div className="rounded-2xl bg-gradient-to-br from-blue-50 to-white border border-blue-200 p-6 hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
 
                             <p className="text-sm text-slate-500">
-                                Support Tickets
+                                Total Business
                             </p>
 
                             <h2 className="text-3xl font-bold text-blue-600 mt-2">
-                                02
+                                ₹ {totalBusiness.toLocaleString()}
                             </h2>
 
                         </div>
@@ -197,11 +266,11 @@ function CustomerProfileCard({
                         <div className="rounded-2xl bg-gradient-to-br from-orange-50 to-white border border-orange-200 p-6 hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
 
                             <p className="text-sm text-slate-500">
-                                Follow Ups
+                                Total Installations
                             </p>
 
                             <h2 className="text-3xl font-bold text-orange-500 mt-2">
-                                04
+                                {totalInstallations}
                             </h2>
 
                         </div>
@@ -212,10 +281,9 @@ function CustomerProfileCard({
                                 Customer Since
                             </p>
 
-                            <h2 className="text-2xl font-bold text-purple-600 mt-2">
-                                2024
+                            <h2 className="text-xl font-bold text-purple-600 mt-2">
+                                {customerSince}
                             </h2>
-
                         </div>
 
                     </div>
@@ -225,7 +293,6 @@ function CustomerProfileCard({
 
 
 
-                {/* Billing Information */}
 
                 {/* Customer Products */}
 
@@ -255,55 +322,134 @@ function CustomerProfileCard({
                                 <tr className="border-b border-slate-200 bg-slate-50">
                                     <th className="text-left px-6 py-4">Date</th>
                                     <th className="text-left px-6 py-4">Product</th>
-                                    <th className="text-center px-6 py-4">Qty</th>
-                                    <th className="text-center px-6 py-4">Unit Price</th>
                                     <th className="text-center px-6 py-4">Total</th>
                                     <th className="text-center px-6 py-4">Paid</th>
                                     <th className="text-center px-6 py-4">Pending</th>
                                     <th className="text-center px-6 py-4">Status</th>
+                                    <th className="text-center px-6 py-4">Action</th>
                                 </tr>
 
                             </thead>
 
                             <tbody>
 
-                                <tr className="border-b border-slate-100 hover:bg-slate-50">
+                                {products.length === 0 ? (
 
-                                    <td className="px-6 py-4">
-                                        {customer.customerSince}
-                                    </td>
+                                    <tr>
 
-                                    <td className="px-6 py-4 font-medium">
-                                        {customer.product}
-                                    </td>
+                                        <td
+                                            colSpan="8"
+                                            className="py-8 text-center text-slate-500"
+                                        >
 
-                                    <td className="text-center">
-                                        {customer.quantity}
-                                    </td>
+                                            No Products Added Yet
 
-                                    <td className="text-center">
-                                        ₹ {customer.unitPrice}
-                                    </td>
+                                        </td>
 
-                                    <td className="text-center font-semibold text-blue-600">
-                                        ₹ {customer.totalAmount}
-                                    </td>
+                                    </tr>
 
-                                    <td className="text-center font-semibold text-green-600">
-                                        ₹ {customer.paidAmount}
-                                    </td>
+                                ) : (
 
-                                    <td className="text-center font-semibold text-red-600">
-                                        ₹ {customer.pendingAmount}
-                                    </td>
+                                    products.map((product) => (
 
-                                    <td className="text-center">
-                                        <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold">
-                                            {customer.paymentStatus}
-                                        </span>
-                                    </td>
+                                        <tr
+                                            key={product._id}
+                                            className="border-b hover:bg-slate-50"
+                                        >
 
-                                </tr>
+                                            <td className="px-6 py-4">
+
+                                                {new Date(product.createdAt).toLocaleDateString()}
+
+                                            </td>
+
+                                            <td className="px-6 py-4">
+
+                                                <p className="font-semibold">
+
+                                                    {product.productName}
+
+                                                </p>
+
+
+                                            </td>
+
+                                            <td className="text-center font-semibold text-blue-600">
+
+                                                ₹ {product.totalAmount}
+
+                                            </td>
+
+                                            <td className="text-center font-semibold text-green-600">
+
+                                                ₹ {product.paidAmount}
+
+                                            </td>
+
+                                            <td className="text-center font-semibold text-red-600">
+
+                                                ₹ {product.pendingAmount}
+
+                                            </td>
+
+                                            <td className="text-center">
+
+                                                <span
+                                                    className={`rounded-full px-3 py-1 text-sm font-semibold ${product.paymentStatus === "Paid"
+                                                        ? "bg-green-100 text-green-700"
+                                                        : product.paymentStatus === "Partial"
+                                                            ? "bg-yellow-100 text-yellow-700"
+                                                            : "bg-red-100 text-red-700"
+                                                        }`}
+                                                >
+
+                                                    {product.paymentStatus}
+
+                                                </span>
+
+                                            </td>
+
+                                            <td>
+
+                                                <div className="flex justify-center gap-3">
+
+                                                    <button
+                                                        onClick={() => {
+
+                                                            setSelectedProduct(product);
+
+                                                            setOpenProductModal(true);
+
+                                                        }}
+                                                        className="rounded-xl bg-emerald-100 p-2 text-emerald-600 hover:bg-emerald-600 hover:text-white"
+                                                    >
+
+                                                        ✏
+
+                                                    </button>
+
+                                                    <button
+                                                        onClick={() => {
+
+                                                            setSelectedProduct(product);
+
+                                                            setIsDeleteModalOpen(true);
+
+                                                        }}
+                                                        className="rounded-xl bg-red-100 p-2 text-red-600 hover:bg-red-600 hover:text-white"
+                                                    >
+                                                        🗑
+                                                    </button>
+
+                                                </div>
+
+                                            </td>
+
+                                        </tr>
+
+                                    ))
+
+                                )}
 
                             </tbody>
 
@@ -312,6 +458,8 @@ function CustomerProfileCard({
                     </div>
 
                 </div>
+
+
 
 
 
@@ -331,8 +479,9 @@ function CustomerProfileCard({
 
                                 <span>Total Bill</span>
 
+
                                 <span className="font-bold">
-                                    ₹ {customer.totalAmount?.toLocaleString()}
+                                    ₹ {totalAmount.toLocaleString()}
                                 </span>
 
                             </div>
@@ -342,7 +491,7 @@ function CustomerProfileCard({
                                 <span>Paid Amount</span>
 
                                 <span className="font-bold text-green-600">
-                                    ₹ {customer.paidAmount?.toLocaleString()}
+                                    ₹ {paidAmount.toLocaleString()}
                                 </span>
 
                             </div>
@@ -352,7 +501,7 @@ function CustomerProfileCard({
                                 <span>Pending Amount</span>
 
                                 <span className="font-bold text-red-600">
-                                    ₹ {customer.pendingAmount?.toLocaleString()}
+                                    ₹ {pendingAmount.toLocaleString()}
                                 </span>
 
                             </div>
@@ -366,14 +515,14 @@ function CustomerProfileCard({
                                 </span>
 
                                 <span
-                                    className={`px-4 py-2 rounded-full text-sm font-bold ${customer.paymentStatus === "Paid"
+                                    className={`px-4 py-2 rounded-full text-sm font-bold ${paymentStatus === "Paid"
                                         ? "bg-green-100 text-green-700"
-                                        : customer.paymentStatus === "Partial"
+                                        : paymentStatus === "Partial"
                                             ? "bg-orange-100 text-orange-700"
                                             : "bg-red-100 text-red-700"
                                         }`}
                                 >
-                                    {customer.paymentStatus}
+                                    {paymentStatus}
                                 </span>
 
                             </div>
@@ -385,11 +534,62 @@ function CustomerProfileCard({
                 </div>
 
 
+                {/* Product Remarks */}
+
+                <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-8">
+
+                    <h2 className="mb-6 text-2xl font-bold text-slate-800">
+
+                        📝 Product Remarks
+
+                    </h2>
+
+                    {products.length === 0 ? (
+
+                        <p className="text-slate-500">
+
+                            No Remarks Available
+
+                        </p>
+
+                    ) : (
+
+                        <div className="space-y-5">
+
+                            {products.map((product) => (
+
+                                <div
+                                    key={product._id}
+                                    className="rounded-2xl border border-slate-200 p-5"
+                                >
+
+                                    <h3 className="font-bold text-emerald-600">
+
+                                        {product.productName}
+
+                                    </h3>
+
+                                    <p className="mt-2 text-slate-600">
+
+                                        {product.remarks || "No Remarks"}
+
+                                    </p>
+
+                                </div>
+
+                            ))}
+
+                        </div>
+
+                    )}
+
+                </div>
+
+
             </div>
 
         </div>
 
     );
 }
-
 export default CustomerProfileCard;

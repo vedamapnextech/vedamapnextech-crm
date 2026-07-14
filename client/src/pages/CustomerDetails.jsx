@@ -1,15 +1,59 @@
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import AddCustomerModal from "../components/Customers/AddCustomerModal";
 import CustomerProfileCard from "../components/Customers/CustomerProfileCard";
+import DeleteConfirmationModal from "../components/Common/DeleteConfirmationModal";
+import AddCustomerProductModal from "../components/Customers/AddCustomerProductModal";
 function CustomerDetails() {
   const { id } = useParams();
   const [customer, setCustomer] = useState(null);
+  const [installations, setInstallations] = useState([]);
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [openProductModal, setOpenProductModal] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const handleDeleteProduct = async () => {
 
+    if (!selectedProduct) return;
+
+    try {
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/customer-products/${selectedProduct._id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+
+        throw new Error(data.message);
+
+      }
+
+      toast.success("Product Deleted Successfully");
+
+      getProducts();
+
+      setSelectedProduct(null);
+
+      setIsDeleteModalOpen(false);
+
+    } catch (error) {
+
+      console.log(error);
+
+      toast.error("Unable to Delete Product");
+
+    }
+
+  };
 
 
   const getCustomer = () => {
@@ -21,32 +65,87 @@ function CustomerDetails() {
         setSelectedCustomer(data);
       });
   };
+
+
+
+  const getInstallations = () => {
+
+    fetch(
+      `${import.meta.env.VITE_API_URL}/installations/customer/${id}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+
+        setInstallations(data);
+
+      });
+
+  };
+
+
+  const getProducts = () => {
+
+    fetch(
+      `${import.meta.env.VITE_API_URL}/customer-products/${id}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+
+        setProducts(data);
+
+      })
+      .catch((err) => console.log(err));
+
+  };
+
+  const handleDeleteCustomer = async () => {
+
+    if (!selectedCustomer) return;
+
+    try {
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/customers/${selectedCustomer._id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+
+
+      setSelectedCustomer(null);
+
+      setIsDeleteModalOpen(false);
+
+
+
+      navigate("/customers-list");
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
+
+
   useEffect(() => {
     getCustomer();
+    getProducts();
+    getInstallations();
+
   }, [id]);
 
   if (!customer) {
     return <h1 className="p-10 text-2xl">Loading...</h1>;
   }
-  // if (!customer) {
-  //   return (
-  //     <div className="p-10">
-  //       <button
-  //         onClick={() => navigate("/customers")}
-  //         className="mb-6 flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500 hover:text-emerald-600 hover:shadow-lg"
-  //       >
-  //         ← Back to Customers
-  //       </button>
-  //       <h1 className="text-3xl font-bold text-red-600">
-  //         Customer Not Found
-  //       </h1>
 
-  //       <p className="text-slate-500 mt-2">
-  //         This customer does not exist.
-  //       </p>
-  //     </div>
-  //   );
-  // }
 
 
   return (
@@ -54,7 +153,7 @@ function CustomerDetails() {
 
       <div className="mb-6">
         <button
-          onClick={() => navigate("/customers")}
+          onClick={() => navigate("/customers-list")}
           className="flex items-center gap-2 rounded-xl bg-white px-5 py-3 border border-slate-200 shadow-sm hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition"
         >
           ← Back to Customers
@@ -63,9 +162,15 @@ function CustomerDetails() {
 
       <CustomerProfileCard
         customer={customer}
+        products={products}
+        getProducts={getProducts}
+        selectedProduct={selectedProduct}
+        setSelectedProduct={setSelectedProduct}
         setOpenModal={setOpenModal}
         setSelectedCustomer={setSelectedCustomer}
         setOpenProductModal={setOpenProductModal}
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
+        installations={installations}
       />
 
 
@@ -80,29 +185,50 @@ function CustomerDetails() {
         />
       )}
       {openProductModal && (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <AddCustomerProductModal
+          customer={customer}
+          setOpenModal={setOpenProductModal}
+          selectedProduct={selectedProduct}
+          setSelectedProduct={setSelectedProduct}
+          getProducts={getProducts}
+        />
+      )}
 
-        <div className="bg-white rounded-3xl w-[500px] p-8">
+      <DeleteConfirmationModal
+        open={isDeleteModalOpen}
+        title={
+          selectedProduct
+            ? "Delete Product"
+            : "Delete Customer"
+        }
+        message={
+          selectedProduct
+            ? `Are you sure you want to delete "${selectedProduct.productName}"? This action cannot be undone.`
+            : `Are you sure you want to delete "${selectedCustomer?.name}"? This action cannot be undone.`
+        }
+        onClose={() => {
 
-            <h2 className="text-2xl font-bold">
-                Add Product
-            </h2>
+          setIsDeleteModalOpen(false);
 
-            <p className="text-slate-500 mt-2">
-                Product module coming next...
-            </p>
+          setSelectedProduct(null);
 
-            <button
-                onClick={() => setOpenProductModal(false)}
-                className="mt-6 px-6 py-3 rounded-xl bg-emerald-500 text-white"
-            >
-                Close
-            </button>
+          setSelectedCustomer(null);
 
-        </div>
+        }}
+        onDelete={() => {
 
-    </div>
-)}
+          if (selectedProduct) {
+
+            handleDeleteProduct();
+
+          } else {
+
+            handleDeleteCustomer();
+
+          }
+
+        }}
+      />
 
 
     </div>

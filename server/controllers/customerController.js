@@ -1,4 +1,27 @@
 const Customer = require("../models/Customer");
+const CustomerProduct = require("../models/CustomerProduct");
+const Installation = require("../models/Installation");
+
+const generateWBCode = async () => {
+
+    const lastCustomer = await Customer.findOne()
+        .sort({ createdAt: -1 });
+
+    if (!lastCustomer || !lastCustomer.wbCode) {
+
+        return "WB000001";
+
+    }
+
+    const lastNumber = parseInt(
+        lastCustomer.wbCode.replace("WB", "")
+    );
+
+    const nextNumber = lastNumber + 1;
+
+    return `WB${String(nextNumber).padStart(6, "0")}`;
+
+};
 
 const getCustomers = async (req, res) => {
     try {
@@ -8,10 +31,14 @@ const getCustomers = async (req, res) => {
 
         if (search) {
             filter.$or = [
+                { wbCode: { $regex: search, $options: "i" } },
                 { name: { $regex: search, $options: "i" } },
                 { company: { $regex: search, $options: "i" } },
+                { contactPerson: { $regex: search, $options: "i" } },
+                { phone: { $regex: search, $options: "i" } },
                 { city: { $regex: search, $options: "i" } },
-                { product: { $regex: search, $options: "i" } },
+                { gstNumber: { $regex: search, $options: "i" } },
+                { email: { $regex: search, $options: "i" } },
             ];
         }
 
@@ -39,15 +66,27 @@ const getCustomers = async (req, res) => {
 
 const addCustomer = async (req, res) => {
     try {
-        const customer = await Customer.create(req.body);
+
+        const wbCode = await generateWBCode();
+
+        const customer = await Customer.create({
+
+            ...req.body,
+
+            wbCode,
+
+        });
 
         res.status(201).json(customer);
+
     } catch (error) {
+
         console.log(error);
 
         res.status(500).json({
             message: "Server Error",
         });
+
     }
 };
 
@@ -99,7 +138,8 @@ const updateCustomer = async (req, res) => {
 
 const deleteCustomer = async (req, res) => {
     try {
-        const customer = await Customer.findByIdAndDelete(req.params.id);
+
+        const customer = await Customer.findById(req.params.id);
 
         if (!customer) {
             return res.status(404).json({
@@ -107,16 +147,85 @@ const deleteCustomer = async (req, res) => {
             });
         }
 
+        // Delete all products of this customer
+        await CustomerProduct.deleteMany({
+            customerId: req.params.id,
+        });
+
+        // Delete all installations of this customer
+        await Installation.deleteMany({
+            customer: req.params.id,
+        });
+
+        // Finally delete customer
+        await Customer.findByIdAndDelete(req.params.id);
+
         res.json({
             message: "Customer Deleted Successfully",
         });
+
     } catch (error) {
+
         console.log(error);
 
         res.status(500).json({
             message: "Server Error",
         });
+
     }
+};
+
+
+
+const Lead = require("../models/Lead");
+
+const convertLeadToCustomer = async (req, res) => {
+
+    try {
+
+        const lead = await Lead.findById(req.params.id);
+
+        if (!lead) {
+
+            return res.status(404).json({
+                message: "Lead Not Found",
+            });
+
+        }
+
+        const wbCode = await generateWBCode();
+
+        const customer = await Customer.create({
+
+            wbCode,
+
+            name: lead.name,
+            company: lead.company,
+            contactPerson: lead.name,
+            phone: lead.phone,
+            city: lead.city,
+            address: lead.address,
+
+            customerType: "Company",
+
+            status: "Active",
+
+        });
+
+        await Lead.findByIdAndDelete(req.params.id);
+
+        res.status(201).json(customer);
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+            message: "Server Error",
+        });
+
+    }
+
 };
 
 module.exports = {
@@ -125,4 +234,5 @@ module.exports = {
     getCustomerById,
     updateCustomer,
     deleteCustomer,
+    convertLeadToCustomer,
 };

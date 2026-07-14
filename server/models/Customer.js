@@ -2,65 +2,81 @@ const mongoose = require("mongoose");
 
 const customerSchema = new mongoose.Schema(
   {
+    // Customer Basic Information
+    wbCode: {
+      type: String,
+      unique: true,
+      trim: true,
+    },
+
     name: {
       type: String,
       required: true,
+      trim: true,
+    },
+
+    company: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    contactPerson: {
+      type: String,
+      default: "",
+      trim: true,
     },
 
     phone: {
       type: String,
       required: true,
+      trim: true,
     },
 
-    company: String,
+    email: {
+      type: String,
+      default: "",
+      trim: true,
+    },
 
-    city: String,
+    gstNumber: {
+      type: String,
+      default: "",
+      trim: true,
+      uppercase: true,
+    },
 
-    email: String,
+    city: {
+      type: String,
+      default: "",
+      trim: true,
+    },
 
-    product: String,
+    address: {
+      type: String,
+      default: "",
+      maxlength: 1000,
+    },
 
-    address: String,
+    // Business Information
+    customerType: {
+      type: String,
+      enum: ["Individual", "Company"],
+      default: "Company",
+    },
 
     status: {
       type: String,
+      enum: ["Active", "Inactive"],
       default: "Active",
     },
-
-    quantity: {
-      type: Number,
-      default: 1,
-    },
-
-    unitPrice: {
-      type: Number,
-      default: 0,
-    },
-
-    totalAmount: {
-      type: Number,
-      default: 0,
-    },
-
-    paidAmount: {
-      type: Number,
-      default: 0,
-    },
-
-    pendingAmount: {
-      type: Number,
-      default: 0,
-    },
-
-    paymentStatus: {
-      type: String,
-      default: "Pending",
-    },
-
+    // Customer Information
     customerSince: {
       type: Date,
       default: Date.now,
     },
+
+   
   },
   {
     timestamps: true,

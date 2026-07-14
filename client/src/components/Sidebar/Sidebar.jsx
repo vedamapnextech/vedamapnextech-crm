@@ -1,5 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { HiOutlineBars3 } from "react-icons/hi2";
+import { MdManageAccounts } from "react-icons/md";
+
 import {
   MdDashboard,
   MdPeople,
@@ -8,6 +10,7 @@ import {
   MdSupportAgent,
   MdAssessment,/*  */
   MdSettings,
+
 } from "react-icons/md";
 
 function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
@@ -116,6 +119,17 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
         </NavLink>
 
         <NavLink
+          to="/employees"
+          className={`${menuStyle} ${isSidebarOpen ? "justify-start" : "justify-center"
+            }`}
+        >
+          <MdManageAccounts className="text-[24px] shrink-0 group-hover:scale-110 transition-transform duration-300" />
+          {isSidebarOpen && (
+            <span className="text-[17px]">Employees</span>
+          )}
+        </NavLink>
+
+        <NavLink
           to="/reports"
           className={`${menuStyle} ${isSidebarOpen ? "justify-start" : "justify-center"
             }`}
@@ -140,7 +154,7 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
         </NavLink>
 
       </nav>
-      
+
 
       {/* Bottom Profile */}
 
@@ -166,7 +180,7 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
 
         </div>
       )} */}
-      
+
 
     </aside>
   );

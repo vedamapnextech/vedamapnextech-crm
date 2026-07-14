@@ -1,331 +1,592 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+
 function AddCustomerModal({
+
     setOpenModal,
-    customers,
-    setCustomers,
     selectedCustomer,
     setSelectedCustomer,
     getCustomers,
+
 }) {
+
     const [formData, setFormData] = useState({
+
+        wbCode: "",
+
         name: "",
-        phone: "",
+
         company: "",
-        city: "",
+
+        contactPerson: "",
+
+        phone: "",
+
         email: "",
-        product: "",
+
+        gstNumber: "",
+
+        city: "",
+
         address: "",
 
-        quantity: 1,
-        unitPrice: "",
-        totalAmount: "",
-        paidAmount: "",
-        pendingAmount: "",
-        paymentStatus: "Pending",
-        customerSince: new Date().toISOString().split("T")[0],
+        status: "Active",
+
+      
+
     });
+
     useEffect(() => {
+
         if (selectedCustomer) {
-            setFormData(selectedCustomer);
+
+            setFormData({
+
+                wbCode: selectedCustomer.wbCode || "",
+
+                name: selectedCustomer.name || "",
+
+                company: selectedCustomer.company || "",
+
+                contactPerson:
+                    selectedCustomer.contactPerson || "",
+
+                phone: selectedCustomer.phone || "",
+
+                email: selectedCustomer.email || "",
+
+                gstNumber:
+                    selectedCustomer.gstNumber || "",
+
+                city: selectedCustomer.city || "",
+
+                address: selectedCustomer.address || "",
+
+                status:
+                    selectedCustomer.status || "Active",
+
+              
+
+            });
+
         }
+
     }, [selectedCustomer]);
 
 
+
     const handleChange = (e) => {
-        const { name, value } = e.target;
 
-        const updatedData = {
-            ...formData,
-            [name]: value,
-        };
+        let { name, value } = e.target;
 
-        const quantity = Number(updatedData.quantity) || 0;
-        const unitPrice = Number(updatedData.unitPrice) || 0;
-        const paidAmount = Number(updatedData.paidAmount) || 0;
+        if (name === "phone") {
 
-        updatedData.totalAmount = quantity * unitPrice;
-        updatedData.pendingAmount = Math.max(
-            updatedData.totalAmount - paidAmount,
-            0
-        );
-        if (updatedData.pendingAmount === 0) {
-            updatedData.paymentStatus = "Paid";
-        } else if (paidAmount > 0) {
-            updatedData.paymentStatus = "Partial";
-        } else {
-            updatedData.paymentStatus = "Pending";
+            value = value
+                .replace(/\D/g, "")
+                .slice(0, 10);
+
         }
-        setFormData(updatedData);
+
+        if (
+
+            name === "name" ||
+
+            name === "company" ||
+
+            name === "contactPerson" ||
+
+            name === "city"
+
+        ) {
+
+            value = value
+
+                .toLowerCase()
+
+                .replace(
+
+                    /\b\w/g,
+
+                    (char) => char.toUpperCase()
+
+                );
+
+        }
+
+        if (name === "gstNumber") {
+
+            value = value.toUpperCase();
+
+        }
+
+        setFormData({
+
+            ...formData,
+
+            [name]: value,
+
+        });
+
     };
 
 
-    const handleSubmit = () => {
-        if (
-            formData.name.trim() === "" ||
-            formData.phone.trim() === ""
-        ) {
-            alert("Customer Name and Phone are required.");
-            return;
-        }
-        if (selectedCustomer) {
 
-            fetch(`${import.meta.env.VITE_API_URL}/customers/${selectedCustomer._id}`, {
-                method: "PUT",
+    const handleSubmit = async () => {
+
+        if (
+
+            !formData.name.trim() ||
+
+            !formData.company.trim() ||
+
+            !formData.phone.trim() ||
+
+            !formData.city.trim()
+
+        ) {
+
+            toast.error("Please fill all required fields.");
+
+            return;
+
+        }
+
+        if (formData.phone.length !== 10) {
+
+            toast.error("Phone Number must be 10 digits.");
+
+            return;
+
+        }
+
+        const url = selectedCustomer
+
+            ? `${import.meta.env.VITE_API_URL}/customers/${selectedCustomer._id}`
+
+            : `${import.meta.env.VITE_API_URL}/customers`;
+
+        const method =
+
+            selectedCustomer
+
+                ? "PUT"
+
+                : "POST";
+
+        try {
+
+            const response = await fetch(url, {
+
+                method,
 
                 headers: {
+
                     "Content-Type": "application/json",
+
                 },
 
                 body: JSON.stringify(formData),
-            })
-                .then((res) => res.json())
-                .then((data) => {
 
-                    console.log(data);
-
-                    getCustomers();
-
-                    setFormData({
-                        name: "",
-                        phone: "",
-                        company: "",
-                        city: "",
-                        email: "",
-                        product: "",
-                        address: "",
-
-
-                        quantity: 1,
-                        unitPrice: "",
-                        totalAmount: "",
-                        paidAmount: "",
-                        pendingAmount: "",
-                        paymentStatus: "Pending",
-                        customerSince: new Date().toISOString().split("T")[0],
-                    });
-
-                    setSelectedCustomer(null);
-
-                    setOpenModal(false);
-
-                });
-
-            return;
-        }
-        // const newCustomer = {
-        //     id: customers.length + 1,
-        //     ...formData,
-        //     status: "Active",
-        // };
-        // setCustomers([...customers, newCustomer]);
-        // setFormData({
-        //     name: "",
-        //     phone: "",
-        //     company: "",
-        //     city: "",
-        //     email: "",
-        //     product: "",
-        //     address: "",
-        // });
-        // setSelectedCustomer(null);
-        // setOpenModal(false);
-
-        fetch(`${import.meta.env.VITE_API_URL}/customers`, {
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json",
-            },
-
-            body: JSON.stringify(formData),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data);
-
-                getCustomers();
-
-                setFormData({
-                    name: "",
-                    phone: "",
-                    company: "",
-                    city: "",
-                    email: "",
-                    product: "",
-                    address: "",
-
-                    quantity: 1,
-                    unitPrice: "",
-                    totalAmount: "",
-                    paidAmount: "",
-                    pendingAmount: "",
-                    paymentStatus: "Pending",
-                    customerSince: new Date().toISOString().split("T")[0],
-
-                });
-
-                setSelectedCustomer(null);
-
-                setOpenModal(false);
             });
 
+            if (!response.ok) {
+
+                throw new Error();
+
+            }
+
+            toast.success(
+
+                selectedCustomer
+
+                    ? "Customer Updated Successfully"
+
+                    : "Customer Added Successfully"
+
+            );
+
+            getCustomers();
+
+            setSelectedCustomer(null);
+
+            setOpenModal(false);
+
+        } catch (error) {
+
+            toast.error("Something went wrong.");
+
+        }
+
     };
+
     return (
 
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl p-6"> <div
-                className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl p-6"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                        handleSubmit();
-                    }
-                }}
-            ></div>               
-            <h2 className="text-2xl font-bold text-slate-800 leading-tight">
-                    {selectedCustomer ? "Edit Customer" : "Add New Customer"}
-                </h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
 
-                <p className="text-slate-500 mt-2">
-                    Fill customer details below.
-                </p>
-                <div className="grid md:grid-cols-2 grid-cols-1 gap-4 mt-4">
+            <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white p-8 shadow-2xl">
 
-                    <input
-                        type="text"
-                        placeholder="Customer Name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
+                {/* Header */}
 
-                    <input
-                        type="text"
-                        name="phone"
-                        placeholder="Phone Number"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className="border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
+                <div className="mb-8 flex items-center justify-between border-b border-slate-200 pb-5">
 
-                    <input
-                        type="text"
-                        name="company"
-                        placeholder="Company Name"
-                        value={formData.company}
-                        onChange={handleChange}
-                        className="border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
+                    <div>
 
-                    <input
-                        type="text"
-                        name="city"
-                        placeholder="City"
-                        value={formData.city}
-                        onChange={handleChange}
-                        className="border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Email Address"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
-                    <input
-                        type="text"
-                        name="product"
-                        placeholder="Product"
-                        value={formData.product}
-                        onChange={handleChange}
-                        className="border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
+                        <h2 className="text-3xl font-bold text-slate-800">
 
+                            {selectedCustomer
+                                ? "Edit Customer"
+                                : "Add Customer"}
 
-                    <input
-                        type="number"
-                        name="quantity"
-                        placeholder="Quantity"
-                        value={formData.quantity}
-                        onChange={handleChange}
-                        className="border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
+                        </h2>
 
-                    <input
-                        type="number"
-                        name="unitPrice"
-                        placeholder="Unit Price"
-                        value={formData.unitPrice}
-                        onChange={handleChange}
-                        className="border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
+                        <p className="mt-2 text-slate-500">
 
-                    <input
-                        type="number"
-                        name="paidAmount"
-                        placeholder="Paid Amount"
-                        value={formData.paidAmount}
-                        onChange={handleChange}
-                        className="border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
+                            Fill customer information below.
 
-                    <input
-                        type="number"
-                        value={formData.totalAmount}
-                        readOnly
-                        placeholder="Total Amount"
-                        className="border border-slate-300 rounded-xl px-4 py-3 bg-slate-100"
-                    />
+                        </p>
 
-                    <input
-                        type="number"
-                        value={formData.pendingAmount}
-                        readOnly
-                        placeholder="Pending Amount"
-                        className="border border-slate-300 rounded-xl px-4 py-3 bg-slate-100"
-                    />
+                    </div>
 
-                    <select
-                        name="paymentStatus"
-                        value={formData.paymentStatus}
-                        onChange={handleChange}
-                        className="border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500"
+                    <button
+
+                        onClick={() => {
+
+                            setSelectedCustomer(null);
+
+                            setOpenModal(false);
+
+                        }}
+
+                        className="rounded-xl bg-red-100 px-4 py-2 font-bold text-red-600 transition hover:bg-red-600 hover:text-white"
+
                     >
-                        <option value="Pending">Pending</option>
-                        <option value="Partial">Partial</option>
-                        <option value="Paid">Paid</option>
-                    </select>
 
+                        ✕
 
-
+                    </button>
 
                 </div>
 
 
-                <textarea
-                    name="address"
-                    placeholder="Customer Address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    className="w-full mt-4 border border-slate-300 rounded-xl px-4 py-3 h-20 resize-none outline-none focus:ring-2 focus:ring-emerald-500" />
-                <div className="flex justify-end gap-4 mt-5">
 
-                    <button onClick={() => {
-                        setSelectedCustomer(null);
-                        setOpenModal(false);
-                    }}
-                        className="px-6 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-100 transition"
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+                    {/* WB Code */}
+
+                    <div>
+
+                        <label className="mb-2 block text-sm font-semibold">
+
+                            WB Code
+
+                        </label>
+
+                        <input
+
+                            type="text"
+
+                            value={formData.wbCode}
+
+                            readOnly
+
+                            placeholder="Auto Generated"
+
+                            className="w-full rounded-2xl border bg-slate-100 px-4 py-3"
+
+                        />
+
+                    </div>
+
+
+
+                    {/* Customer Name */}
+
+                    <div>
+
+                        <label className="mb-2 block text-sm font-semibold">
+
+                            Customer Name *
+
+                        </label>
+
+                        <input
+
+                            type="text"
+
+                            name="name"
+
+                            value={formData.name}
+
+                            onChange={handleChange}
+
+                            className="w-full rounded-2xl border px-4 py-3"
+
+                        />
+
+                    </div>
+
+
+
+                    {/* Company */}
+
+                    <div>
+
+                        <label className="mb-2 block text-sm font-semibold">
+
+                            Company *
+
+                        </label>
+
+                        <input
+
+                            type="text"
+
+                            name="company"
+
+                            value={formData.company}
+
+                            onChange={handleChange}
+
+                            className="w-full rounded-2xl border px-4 py-3"
+
+                        />
+
+                    </div>
+
+
+
+                    {/* Contact Person */}
+
+                    <div>
+
+                        <label className="mb-2 block text-sm font-semibold">
+
+                            Contact Person
+
+                        </label>
+
+                        <input
+
+                            type="text"
+
+                            name="contactPerson"
+
+                            value={formData.contactPerson}
+
+                            onChange={handleChange}
+
+                            className="w-full rounded-2xl border px-4 py-3"
+
+                        />
+
+                    </div>
+
+
+
+                    {/* Phone */}
+
+                    <div>
+
+                        <label className="mb-2 block text-sm font-semibold">
+
+                            Phone *
+
+                        </label>
+
+                        <input
+
+                            type="text"
+
+                            name="phone"
+
+                            value={formData.phone}
+
+                            onChange={handleChange}
+
+                            className="w-full rounded-2xl border px-4 py-3"
+
+                        />
+
+                    </div>
+
+
+
+                    {/* Email */}
+
+                    <div>
+
+                        <label className="mb-2 block text-sm font-semibold">
+
+                            Email
+
+                        </label>
+
+                        <input
+
+                            type="email"
+
+                            name="email"
+
+                            value={formData.email}
+
+                            onChange={handleChange}
+
+                            className="w-full rounded-2xl border px-4 py-3"
+
+                        />
+
+                    </div>
+
+
+
+                    {/* GST */}
+
+                    <div>
+
+                        <label className="mb-2 block text-sm font-semibold">
+
+                            GST Number
+
+                        </label>
+
+                        <input
+
+                            type="text"
+
+                            name="gstNumber"
+
+                            value={formData.gstNumber}
+
+                            onChange={handleChange}
+
+                            className="w-full rounded-2xl border px-4 py-3 uppercase"
+
+                        />
+
+                    </div>
+
+
+
+                    {/* City */}
+
+                    <div>
+
+                        <label className="mb-2 block text-sm font-semibold">
+
+                            City *
+
+                        </label>
+
+                        <input
+
+                            type="text"
+
+                            name="city"
+
+                            value={formData.city}
+
+                            onChange={handleChange}
+
+                            className="w-full rounded-2xl border px-4 py-3"
+
+                        />
+
+                    </div>
+
+
+
+                    {/* Status */}
+
+                    <div>
+
+                        <label className="mb-2 block text-sm font-semibold">
+
+                            Status
+
+                        </label>
+
+                        <select
+
+                            name="status"
+
+                            value={formData.status}
+
+                            onChange={handleChange}
+
+                            className="w-full rounded-2xl border px-4 py-3"
+
+                        >
+
+                            <option value="Active">
+
+                                Active
+
+                            </option>
+
+                            <option value="Inactive">
+
+                                Inactive
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+
+                {/* Address */}
+
+                <div className="mt-6">
+
+                    <label className="mb-2 block text-sm font-semibold">
+
+                        Address
+
+                    </label>
+
+                    <textarea
+
+                        name="address"
+
+                        rows={3}
+
+                        value={formData.address}
+
+                        onChange={handleChange}
+
+                        className="w-full rounded-2xl border px-4 py-3"
+
+                    />
+
+                </div>
+
+
+
+               
+                {/* Footer */}
+
+                <div className="mt-8 flex justify-end gap-4 border-t border-slate-200 pt-6">
+
+                    <button
+                        onClick={() => {
+                            setSelectedCustomer(null);
+                            setOpenModal(false);
+                        }}
+                        className="rounded-xl border border-slate-300 px-6 py-3 font-semibold transition hover:bg-slate-100"
                     >
                         Cancel
                     </button>
 
                     <button
                         onClick={handleSubmit}
-                        className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition"
+                        className="rounded-xl bg-emerald-500 px-8 py-3 font-semibold text-white transition hover:bg-emerald-600"
                     >
-                        {selectedCustomer ? "Update Customer" : "Save Customer"}
+                        {selectedCustomer
+                            ? "Update Customer"
+                            : "Save Customer"}
                     </button>
 
                 </div>
@@ -335,6 +596,7 @@ function AddCustomerModal({
         </div>
 
     );
+
 }
 
 export default AddCustomerModal;

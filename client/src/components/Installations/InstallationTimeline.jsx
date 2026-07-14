@@ -4,15 +4,14 @@ import {
     FiCalendar,
     FiClock,
 } from "react-icons/fi";
+import { formatDate } from "../../utils/formatters";
 
 function InstallationTimeline({ installation }) {
 
     const timeline = [
         {
             title: "Installation Created",
-            value: new Date(
-                installation.createdAt
-            ).toLocaleDateString(),
+            value: formatDate(installation.createdAt),
             icon: <FiCalendar />,
             color: "bg-blue-500",
         },
@@ -26,23 +25,23 @@ function InstallationTimeline({ installation }) {
 
         {
             title: installation.status,
-            value: new Date(
-                installation.installationDate
-            ).toLocaleDateString(),
+            value: formatDate(installation.installationDate),
             icon: <FiCheckCircle />,
             color:
                 installation.status === "Completed"
                     ? "bg-emerald-500"
                     : installation.status === "Pending"
-                    ? "bg-yellow-500"
-                    : "bg-red-500",
+                        ? "bg-yellow-500"
+                        : installation.status === "In Progress"
+                            ? "bg-blue-500"
+                            : installation.status === "On Hold"
+                                ? "bg-purple-500"
+                                : "bg-red-500",
         },
 
         {
             title: "Last Updated",
-            value: new Date(
-                installation.updatedAt
-            ).toLocaleDateString(),
+            value: formatDate(installation.updatedAt),
             icon: <FiClock />,
             color: "bg-slate-600",
         },

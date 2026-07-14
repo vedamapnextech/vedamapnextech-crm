@@ -12,13 +12,23 @@ const Navbar = () => {
   let subtitle = "Welcome back 👋 Mayank";
 
   if (location.pathname === "/customers") {
+    title = "Leads";
+    subtitle = "Manage all leads";
+  }
+
+  if (location.pathname === "/customers-list") {
     title = "Customers";
-    subtitle = "Manage all customers";
+    subtitle = "Manage all converted customers";
+  }
+
+  if (location.pathname.startsWith("/leads/")) {
+    title = "Lead Details";
+    subtitle = id ? `Lead ID #${id.slice(-6)}` : "";
   }
 
   if (location.pathname.startsWith("/customer/")) {
     title = "Customer Details";
-    subtitle = `Customer ID #${id}`;
+    subtitle = id ? `Customer ID #${id.slice(-6)}` : "";
   }
 
   if (location.pathname === "/products") {
@@ -28,7 +38,7 @@ const Navbar = () => {
 
   if (location.pathname.startsWith("/products/")) {
     title = "Product Details";
-    subtitle = `Product ID #${id.slice(-6)}`;
+    subtitle = id ? `Product ID #${id.slice(-6)}` : "";
   }
 
   if (location.pathname === "/installations") {
@@ -38,12 +48,27 @@ const Navbar = () => {
 
   if (location.pathname.startsWith("/installations/")) {
     title = "Installation Details";
-    subtitle = `Installation ID #${id.slice(-6)}`;
+    subtitle = id ? `Installation ID #${id.slice(-6)}` : "";
   }
 
   if (location.pathname === "/support") {
     title = "Support";
     subtitle = "Manage customer support";
+  }
+
+  if (location.pathname.startsWith("/support/")) {
+    title = "Support Ticket Details";
+    subtitle = id ? `Ticket ID #${id.slice(-6)}` : "";
+  }
+
+  if (location.pathname === "/employees") {
+    title = "Employees";
+    subtitle = "Manage all company employees";
+  }
+
+  if (location.pathname.startsWith("/employees/")) {
+    title = "Employee Details";
+    subtitle = id ? `Employee ID #${id.slice(-6)}` : "";
   }
 
   if (location.pathname === "/reports") {

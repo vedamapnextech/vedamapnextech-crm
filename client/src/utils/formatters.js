@@ -14,3 +14,8 @@ export const toTitleCase = (text = "") => {
 export const toUpperCaseText = (text = "") => {
     return text.trim().toUpperCase();
 };
+export const formatDate = (date) => {
+    if (!date) return "-";
+
+    return new Date(date).toLocaleDateString("en-GB");
+};
