@@ -20,8 +20,7 @@ function ProductTable({ products, setOpenModal,
                         <tr className="text-left">
 
                             <th className="px-6 py-5">Product</th>
-                            <th className="px-6 py-5">Category</th>
-                            <th className="px-6 py-5">Price</th>
+                            <th className="px-6 py-5">Unit Price</th>
                             <th className="px-6 py-5">Stock</th>
                             <th className="px-6 py-5">Status</th>
                             <th className="px-6 py-5 text-center">
@@ -64,30 +63,34 @@ function ProductTable({ products, setOpenModal,
 
                                 </td>
 
-                                <td className="px-6 py-5">
-                                    {product.category}
-                                </td>
-
                                 <td className="px-6 py-5 font-semibold">
-                                    ₹ {product.price}
+                                    ₹ {Number(product.price).toLocaleString("en-IN")}
                                 </td>
 
                                 <td className="px-6 py-5">
 
-                                    <span className="rounded-full bg-blue-100 px-4 py-2 text-blue-700">
-
+                                    <span
+                                        className={`rounded-full px-4 py-2 font-semibold ${product.stock === 0
+                                            ? "bg-red-100 text-red-700"
+                                            : product.stock <= 10
+                                                ? "bg-orange-100 text-orange-700"
+                                                : "bg-emerald-100 text-emerald-700"
+                                            }`}
+                                    >
                                         {product.stock}
-
                                     </span>
 
                                 </td>
 
                                 <td className="px-6 py-5">
 
-                                    <span className="rounded-full bg-emerald-100 px-4 py-2 text-emerald-700">
-
+                                    <span
+                                        className={`rounded-full px-4 py-2 font-semibold ${product.status === "Active"
+                                            ? "bg-emerald-100 text-emerald-700"
+                                            : "bg-red-100 text-red-700"
+                                            }`}
+                                    >
                                         {product.status}
-
                                     </span>
 
                                 </td>

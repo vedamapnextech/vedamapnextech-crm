@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 function AddProductModal({
     setOpenModal,
     getProducts,
@@ -8,7 +9,6 @@ function AddProductModal({
 
     const [productData, setProductData] = useState({
         name: selectedProduct?.name || "",
-        category: selectedProduct?.category || "",
         brand: selectedProduct?.brand || "",
         model: selectedProduct?.model || "",
         price: selectedProduct?.price || "",
@@ -22,7 +22,6 @@ function AddProductModal({
     useEffect(() => {
         setProductData({
             name: selectedProduct?.name || "",
-            category: selectedProduct?.category || "",
             brand: selectedProduct?.brand || "",
             model: selectedProduct?.model || "",
             price: selectedProduct?.price || "",
@@ -44,34 +43,41 @@ function AddProductModal({
 
 
     const handleSubmit = () => {
-        if (!productData.name || !productData.category || !productData.price) {
-            alert("Please fill all required fields");
+
+        if (
+            !productData.name ||
+            !productData.price ||
+            !productData.gst ||
+            !productData.warranty
+        ) {
+            toast.error("Please fill all required fields");
             return;
         }
 
         fetch(
-
             selectedProduct
                 ? `${import.meta.env.VITE_API_URL}/products/${selectedProduct._id}`
                 : `${import.meta.env.VITE_API_URL}/products`,
-
             {
                 method: selectedProduct ? "PUT" : "POST",
-
                 headers: {
                     "Content-Type": "application/json",
                 },
-
                 body: JSON.stringify(productData),
-
             }
-
         )
             .then((res) => res.json())
             .then((data) => {
 
                 console.log(data);
+
                 if (data._id) {
+
+                    toast.success(
+                        selectedProduct
+                            ? "Product Updated Successfully"
+                            : "Product Added Successfully"
+                    );
 
                     getProducts();
 
@@ -79,28 +85,21 @@ function AddProductModal({
 
                     setOpenModal(false);
 
-                }
-                else {
-                    alert(data.message || "Product Save Failed");
+                } else {
+
+                    toast.error(data.message || "Product Save Failed");
+
                 }
 
             })
             .catch((err) => console.log(err));
 
     };
+
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-6">
             <div className=" w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl  bg-white  p-8  shadow-2xl  " >
-
-
-
-
-
-
-
-
-
-
 
 
                 <div className="flex items-center justify-between">
@@ -149,8 +148,9 @@ function AddProductModal({
 
                         <div>
                             <label className="mb-2 block text-sm font-semibold text-slate-700">
-                                Product Name
+                                Product Name <span className="text-red-500">*</span>
                             </label>
+
 
                             <input
                                 type="text"
@@ -162,28 +162,15 @@ function AddProductModal({
                             />
                         </div>
 
-                        {/* Category */}
 
-                        <div>
-                            <label className="mb-2 block text-sm font-semibold text-slate-700">
-                                Category
-                            </label>
 
-                            <input
-                                type="text"
-                                name="category"
-                                value={productData.category}
-                                onChange={handleChange}
-                                placeholder="Enter Category"
-                                className="w-full rounded-xl border border-slate-300 p-3 focus:border-emerald-500 focus:outline-none"
-                            />
-                        </div>
+
 
                         {/* Price */}
 
                         <div>
                             <label className="mb-2 block text-sm font-semibold text-slate-700">
-                                Price
+                                Price<span className="text-red-500">*</span>
                             </label>
 
                             <input
@@ -251,7 +238,7 @@ function AddProductModal({
 
                         <div>
                             <label className="mb-2 block text-sm font-semibold text-slate-700">
-                                GST (%)
+                                GST (%) <span className="text-red-500">*</span>
                             </label>
 
                             <input
@@ -268,7 +255,7 @@ function AddProductModal({
 
                         <div>
                             <label className="mb-2 block text-sm font-semibold text-slate-700">
-                                Warranty
+                                Warranty <span className="text-red-500">*</span>
                             </label>
 
                             <input
@@ -318,7 +305,7 @@ function AddProductModal({
 
                     </div>
 
-                    
+
 
                     <div className="mt-8 flex justify-end gap-4  pt-6">
 
@@ -351,6 +338,7 @@ function AddProductModal({
 
         </div>
     );
+
 }
 
 export default AddProductModal;

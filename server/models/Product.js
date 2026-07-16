@@ -7,10 +7,7 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
 
-    category: {
-      type: String,
-      required: true,
-    },
+   
 
     brand: String,
 

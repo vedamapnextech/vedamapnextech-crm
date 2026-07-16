@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import ProductInfoCard from "../../components/Products/ProductInfoCard";
 import { useNavigate, useParams } from "react-router-dom";
 import AddProductModal from "../../components/Products/AddProductModal";
-import DeleteProductModal from "../../components/Products/DeleteProductModal";
-
+import DeleteConfirmationModal from "../../components/Common/DeleteConfirmationModal";
 function ProductDetails() {
 
     const { id } = useParams();
@@ -98,7 +97,7 @@ function ProductDetails() {
                     <div className="rounded-3xl border border-slate-200 bg-slate-50 p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
 
                         <p className="text-slate-500">
-                            Price
+                            Unit Price
                         </p>
 
                         <h2 className="mt-3 text-4xl font-bold text-emerald-600">
@@ -112,29 +111,35 @@ function ProductDetails() {
                     <div className="rounded-3xl border border-slate-200 bg-slate-50 p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
 
                         <p className="text-slate-500">
-                            Available Stock
+                            Current Stock
                         </p>
 
-                        <h2 className="mt-3 text-4xl font-bold">
-
+                        <h2
+                            className={`mt-3 inline-flex rounded-full px-5 py-2 text-3xl font-bold ${product.stock <= 5
+                                ? "bg-orange-100 text-orange-600"
+                                : "bg-emerald-100 text-emerald-600"
+                                }`}
+                        >
                             {product.stock}
-
                         </h2>
+
+
 
                     </div>
 
                     <div className="rounded-3xl border border-slate-200 bg-slate-50 p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
 
                         <p className="text-slate-500">
-                            Status
+                            Created On
                         </p>
 
-                        <h2 className="mt-3 text-4xl font-bold text-green-600">
-
-                            {product.status}
-
+                        <h2 className="mt-3 text-3xl font-bold text-slate-800">
+                            {new Date(product.createdAt).toLocaleDateString("en-GB")}
                         </h2>
 
+                        <p className="mt-3 text-slate-500">
+                            Product Created Date
+                        </p>
                     </div>
 
                 </div>
@@ -153,27 +158,36 @@ function ProductDetails() {
                         <div className="space-y-5">
 
                             <ProductInfoCard
-                                icon="📂"
-                                title="Category"
-                                value={product.category}
-                            />
-
-                            <ProductInfoCard
                                 icon="🏢"
                                 title="Brand"
-                                value={product.brand}
+                                value={product.brand || "-"}
                             />
 
                             <ProductInfoCard
                                 icon="📦"
                                 title="Model"
-                                value={product.model}
+                                value={product.model || "-"}
                             />
 
                             <ProductInfoCard
                                 icon="🛡️"
                                 title="Warranty"
-                                value={product.warranty}
+                                value={product.warranty || "-"}
+                            />
+
+                            <ProductInfoCard
+                                icon="🧾"
+                                title="GST"
+                                value={product.gst ? `${product.gst}%` : "-"}
+                            />
+
+                            <ProductInfoCard
+                                icon="💰"
+                                title="Total Value"
+                                value={`₹ ${(
+                                    Number(product.price || 0) *
+                                    Number(product.stock || 0)
+                                ).toLocaleString("en-IN")}`}
                             />
 
                         </div>
@@ -336,13 +350,15 @@ function ProductDetails() {
                     )}
 
                     {openDeleteModal && (
-                        <DeleteProductModal
-                            selectedProduct={product}
-                            setSelectedProduct={setProduct}
-                            setOpenDeleteModal={setOpenDeleteModal}
-                            getProducts={() => {
-                                navigate("/products");
+                        <DeleteConfirmationModal
+                            open={openDeleteModal}
+                            title="Delete Product"
+                            message={`Are you sure you want to delete "${selectedProduct?.name}"?`}
+                            onClose={() => {
+                                setOpenDeleteModal(false);
+                                setSelectedProduct(null);
                             }}
+                            onDelete={handleDeleteProduct}
                         />
                     )}
 
