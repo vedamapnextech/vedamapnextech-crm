@@ -17,14 +17,6 @@ const installationSchema = new mongoose.Schema(
     wbCode: {
       type: String,
       required: true,
-      unique: true,
-      trim: true,
-    },
-
-    assetId: {
-      type: String,
-      required: true,
-      unique: true,
       trim: true,
     },
 

@@ -72,25 +72,11 @@ const addInstallation = async (req, res) => {
 
 
 
-        const existingWB = await Installation.findOne({
-            wbCode: req.body.wbCode,
-        });
 
-        if (existingWB) {
-            return res.status(400).json({
-                message: "WB Code already exists.",
-            });
-        }
 
-        const existingAsset = await Installation.findOne({
-            assetId: req.body.assetId,
-        });
 
-        if (existingAsset) {
-            return res.status(400).json({
-                message: "Asset ID already exists.",
-            });
-        }
+
+
 
         const installation = await Installation.create(req.body);
 
@@ -120,27 +106,7 @@ const updateInstallation = async (req, res) => {
     try {
 
 
-        const existingWB = await Installation.findOne({
-            wbCode: req.body.wbCode,
-            _id: { $ne: req.params.id },
-        });
 
-        if (existingWB) {
-            return res.status(400).json({
-                message: "WB Code already exists.",
-            });
-        }
-
-        const existingAsset = await Installation.findOne({
-            assetId: req.body.assetId,
-            _id: { $ne: req.params.id },
-        });
-
-        if (existingAsset) {
-            return res.status(400).json({
-                message: "Asset ID already exists.",
-            });
-        }
 
 
 
@@ -227,6 +193,31 @@ const deleteInstallation = async (req, res) => {
 
 };
 
+
+const getInstallationsByWBCode = async (req, res) => {
+    try {
+
+        const installations = await Installation.find({
+            wbCode: req.params.wbCode,
+        })
+            .populate("product", "name")
+            .populate("customer", "name")
+            .sort({ installationDate: -1 });
+
+        res.json(installations);
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+            message: "Server Error",
+        });
+
+    }
+};
+
+
 const getCustomerInstallations = async (req, res) => {
     try {
 
@@ -256,4 +247,5 @@ module.exports = {
     updateInstallation,
     deleteInstallation,
     getCustomerInstallations,
+    getInstallationsByWBCode,
 };

@@ -29,9 +29,7 @@ function ProductDetails() {
     };
 
     useEffect(() => {
-
-        getProduct();
-
+        getInstallation();
     }, [id]);
 
     if (!product) {

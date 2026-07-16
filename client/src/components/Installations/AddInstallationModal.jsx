@@ -1,13 +1,22 @@
 import { useState, useEffect } from "react";
 import Select from "react-select";
+import CreatableSelect from "react-select/creatable";
 import toast from "react-hot-toast";
 
 function AddInstallationModal({
+
     setOpenModal,
+
     customers,
+
     products,
+
+    employees,
+
     getInstallations,
+
     selectedInstallation,
+
 }) {
     const [installationData, setInstallationData] = useState({
 
@@ -17,7 +26,7 @@ function AddInstallationModal({
 
         wbCode: "",
 
-        assetId: "",
+
 
         siteName: "",
 
@@ -51,7 +60,7 @@ function AddInstallationModal({
 
                 product: selectedInstallation.product?._id || "",
                 wbCode: selectedInstallation.wbCode || "",
-                assetId: selectedInstallation.assetId || "",
+
                 siteName: selectedInstallation.siteName || "",
                 installationType: selectedInstallation.installationType || "New Installation",
 
@@ -81,13 +90,16 @@ function AddInstallationModal({
 
 
 
-
-    const engineerOptions = [
-        { value: "Govind Choudhary", label: "Govind Choudhary" },
-        { value: "Rahul Sharma", label: "Rahul Sharma" },
-        { value: "Amit Singh", label: "Amit Singh" },
-        { value: "Rakesh Kumar", label: "Rakesh Kumar" },
-    ];
+    const engineerOptions = employees
+        .filter(
+            (employee) =>
+                employee.status === "Active" &&
+                employee.role === "Engineer"
+        )
+        .map((employee) => ({
+            value: employee.fullName,
+            label: employee.fullName,
+        }));
 
 
 
@@ -96,7 +108,7 @@ function AddInstallationModal({
 
         let { name, value } = e.target;
 
-        if (name === "wbCode" || name === "assetId") {
+        if (name === "wbCode") {
             value = value.toUpperCase().trim();
         }
 
@@ -110,13 +122,12 @@ function AddInstallationModal({
 
 
 
-
     const resetForm = () => {
         setInstallationData({
             customer: "",
             product: "",
             wbCode: "",
-            assetId: "",
+
             siteName: "",
             installationType: "New Installation",
             location: "",
@@ -140,7 +151,6 @@ function AddInstallationModal({
             !installationData.location.trim() ||
             !installationData.engineer.trim() ||
             !installationData.wbCode.trim() ||
-            !installationData.assetId.trim() ||
             !installationData.siteName.trim() ||
             !installationData.installationType.trim() ||
             !installationData.installationDate
@@ -168,10 +178,13 @@ function AddInstallationModal({
         const payload = {
             ...installationData,
             wbCode: installationData.wbCode.trim(),
-            assetId: installationData.assetId.trim(),
+
             siteName: installationData.siteName.trim(),
             location: installationData.location.trim(),
-            engineer: installationData.engineer.trim(),
+            engineer: installationData.engineer
+                .trim()
+                .toLowerCase()
+                .replace(/\b\w/g, (char) => char.toUpperCase()),
             remarks: installationData.remarks.trim(),
         };
 
@@ -302,7 +315,7 @@ function AddInstallationModal({
                         <div>
 
                             <label className="mb-2 block text-sm font-semibold text-slate-700">
-                                Customer
+                                Customer <span className="text-red-500">*</span>
                             </label>
 
                             <Select
@@ -322,13 +335,21 @@ function AddInstallationModal({
                                         ) || null
                                 }
 
-                                onChange={(selectedOption) =>
+                                onChange={(selectedOption) => {
+
+                                    const selectedCustomer = customers.find(
+                                        (c) => c._id === selectedOption?.value
+                                    );
                                     setInstallationData({
                                         ...installationData,
                                         customer: selectedOption?.value || "",
-                                    })
-                                }
+                                        wbCode: selectedCustomer?.wbCode || "",
+                                        siteName: selectedInstallation
+                                            ? installationData.siteName
+                                            : "",
+                                    });
 
+                                }}
                                 placeholder="Select Customer"
 
                                 isSearchable
@@ -343,7 +364,7 @@ function AddInstallationModal({
                         <div>
 
                             <label className="mb-2 block text-sm font-semibold text-slate-700">
-                                Product
+                                Product <span className="text-red-500">*</span>
                             </label>
                             <Select
                                 options={products.map((product) => ({
@@ -387,35 +408,17 @@ function AddInstallationModal({
                             <input
                                 type="text"
                                 name="wbCode"
+                                readOnly
                                 value={installationData.wbCode}
                                 onChange={handleChange}
                                 placeholder="WB-0001"
-                                className="w-full rounded-xl border border-slate-300 p-3 outline-none focus:border-emerald-500"
-                            />
+                                className="w-full rounded-xl border border-slate-300 bg-slate-100 cursor-not-allowed p-3 outline-none" />
                         </div>
-
 
 
                         <div>
                             <label className="mb-2 block text-sm font-semibold text-slate-700">
-                                Asset ID
-                            </label>
-
-                            <input
-                                type="text"
-                                name="assetId"
-                                value={installationData.assetId}
-                                onChange={handleChange}
-                                placeholder="AST-0001"
-                                className="w-full rounded-xl border border-slate-300 p-3 outline-none focus:border-emerald-500"
-                            />
-                        </div>
-
-
-
-                        <div>
-                            <label className="mb-2 block text-sm font-semibold text-slate-700">
-                                Site Name
+                                Site Name <span className="text-red-500">*</span>
                             </label>
 
                             <input
@@ -432,7 +435,7 @@ function AddInstallationModal({
 
                         <div>
                             <label className="mb-2 block text-sm font-semibold text-slate-700">
-                                Installation Type
+                                Installation Type <span className="text-red-500">*</span>
                             </label>
 
                             <select
@@ -455,7 +458,7 @@ function AddInstallationModal({
                         <div>
 
                             <label className="mb-2 block text-sm font-semibold text-slate-700">
-                                Installation Location
+                                Installation Location <span className="text-red-500">*</span>
                             </label>
 
                             <input
@@ -475,27 +478,25 @@ function AddInstallationModal({
                         <div>
 
                             <label className="mb-2 block text-sm font-semibold text-slate-700">
-                                Engineer
+                                Engineer <span className="text-red-500">*</span>
                             </label>
-
-                            <Select
-                                options={engineerOptions}
-                                value={
-                                    engineerOptions.find(
-                                        (option) => option.value === installationData.engineer
-                                    ) || null
-                                }
-                                onChange={(selectedOption) =>
-                                    setInstallationData({
-                                        ...installationData,
-                                        engineer: selectedOption?.value || "",
-                                    })
-                                }
-                                placeholder="Select Engineer"
-                                isSearchable
-                                className="text-sm"
+                            <input
+                                list="engineers"
+                                name="engineer"
+                                value={installationData.engineer}
+                                onChange={handleChange}
+                                placeholder="Select or Type Engineer"
+                                className="w-full rounded-xl border border-slate-300 p-3 outline-none focus:border-emerald-500"
                             />
 
+                            <datalist id="engineers">
+                                {engineerOptions.map((engineer) => (
+                                    <option
+                                        key={engineer.value}
+                                        value={engineer.value}
+                                    />
+                                ))}
+                            </datalist>
                         </div>
 
                         {/* Installation Date */}
@@ -503,7 +504,7 @@ function AddInstallationModal({
                         <div>
 
                             <label className="mb-2 block text-sm font-semibold text-slate-700">
-                                Installation Date
+                                Installation Date <span className="text-red-500">*</span>
                             </label>
 
                             <input
@@ -528,6 +529,7 @@ function AddInstallationModal({
                                 name="commissioningDate"
                                 value={installationData.commissioningDate}
                                 onChange={handleChange}
+                                max={new Date().toISOString().split("T")[0]}
                                 className="w-full rounded-xl border border-slate-300 p-3 outline-none focus:border-emerald-500"
                             />
                         </div>
@@ -537,7 +539,7 @@ function AddInstallationModal({
                         <div>
 
                             <label className="mb-2 block text-sm font-semibold text-slate-700">
-                                Status
+                                Status <span className="text-red-500">*</span>
                             </label>
 
                             <select
@@ -607,12 +609,6 @@ function AddInstallationModal({
                     </div>
 
                 </form>
-
-
-
-
-
-
 
             </div>
 

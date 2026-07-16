@@ -26,8 +26,7 @@ function InstallationTable({
 
                         <th className="px-6 py-5 text-left">WB Code</th>
 
-                        <th className="px-6 py-5 text-left">Asset ID</th>
-
+                      
                         <th className="px-6 py-5 text-left">Site</th>
 
                         <th className="px-6 py-5 text-left">Type</th>
@@ -91,9 +90,7 @@ function InstallationTable({
                                     {installation.wbCode || "-"}
                                 </td>
 
-                                <td className="px-6 py-5">
-                                    {installation.assetId || "-"}
-                                </td>
+                               
 
                                 <td className="px-6 py-5">
                                     {installation.location || "-"}

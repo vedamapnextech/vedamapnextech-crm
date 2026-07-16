@@ -1,5 +1,6 @@
 
 import AddInstallationModal from "../../components/Installations/AddInstallationModal";
+
 import DeleteConfirmationModal from "../../components/Common/DeleteConfirmationModal";
 import SkeletonCard from "../../components/Common/SkeletonCard";
 import InstallationTimeline from "../../components/Installations/InstallationTimeline";
@@ -23,12 +24,14 @@ import {
 } from "react-icons/fi";
 
 function InstallationDetails() {
+    const [employees, setEmployees] = useState([]);
     const { id } = useParams();
 
     const navigate = useNavigate();
 
 
     const [openModal, setOpenModal] = useState(false);
+    const [otherInstallations, setOtherInstallations] = useState([]);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
     const [installation, setInstallation] = useState(null);
@@ -72,15 +75,58 @@ function InstallationDetails() {
     };
 
 
+
+    const getEmployees = () => {
+        fetch(`${import.meta.env.VITE_API_URL}/employees`)
+            .then((res) => res.json())
+            .then((data) => {
+                setEmployees(data);
+            });
+    };
+
+
+
+
+    const getOtherInstallations = async (wbCode) => {
+        try {
+            const res = await fetch(
+                `${import.meta.env.VITE_API_URL}/installations/wb/${wbCode}`
+            );
+
+            const data = await res.json();
+
+            setOtherInstallations(
+                data.filter((item) => item._id !== id)
+            );
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+    };
+
+
+
     useEffect(() => {
         fetch(`${import.meta.env.VITE_API_URL}/installations/${id}`)
             .then((res) => res.json())
             .then((data) => {
+
                 console.log(data);
+
                 setInstallation(data);
+
+                getOtherInstallations(data.wbCode);
+
+                console.log("WB Code :", data.wbCode);
+
             });
+
+        getEmployees();
         getCustomers();
         getProducts();
+
     }, [id]);
 
     if (!installation) {
@@ -101,6 +147,7 @@ function InstallationDetails() {
             </div>
         );
     }
+    console.log("Other Installations :", otherInstallations);
 
     const statusColor =
         installation.status === "Completed"
@@ -151,7 +198,7 @@ function InstallationDetails() {
             {/* Back */}
 
             <button
-                onClick={() => navigate(-1)}
+               onClick={() => navigate("/installations")}
                 className="
         mb-8
         flex
@@ -240,33 +287,27 @@ function InstallationDetails() {
                     iconBg="bg-violet-100"
                 />
 
-                <InfoCard
-                    icon={<FiPackage className="text-indigo-600" />}
-                    title="Asset ID"
-                    value={installation.assetId}
-                    subTitle="Asset Identification"
-                    iconBg="bg-indigo-100"
-                />
+
 
                 <InfoCard
                     icon={<FiMapPin className="text-orange-600" />}
-                    title="Installation Site"
+                    title="Installation Location"
                     value={installation.location}
-                    subTitle="Weighbridge / Factory Location"
+                    subTitle="Factory / Gate / Weighbridge Position"
                     iconBg="bg-orange-100"
                 />
 
 
                 <InfoCard
                     icon={<FiMapPin className="text-pink-600" />}
-                    title="Site Name"
+                    title="Installation Site"
                     value={installation.siteName}
-                    subTitle="Customer Site"
+                    subTitle="Customer Plant / Site Name"
                     iconBg="bg-pink-100"
                 />
 
                 <InfoCard
-                
+
                     icon={<FiTool className="text-sky-600" />}
                     title="Assigned Engineer"
                     value={installation.engineer}
@@ -359,8 +400,60 @@ function InstallationDetails() {
             </div>
 
 
-            <div className="mt-10">
+            <div className="mt-10 grid grid-cols-1 xl:grid-cols-2 gap-8">
+
                 <InstallationTimeline installation={installation} />
+
+                <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
+
+                    <h2 className="text-3xl font-bold text-slate-800">
+                        Other Installations ({installation.wbCode})
+                    </h2>
+
+                    <div className="mt-6 space-y-3">
+
+                        {otherInstallations.map((item) => (
+
+                            <div
+                                key={item._id}
+                                className="flex items-center justify-between rounded-2xl border border-slate-200 p-4 hover:bg-slate-50"
+                            >
+
+                                <div>
+
+                                    <p className="font-semibold">
+                                        📦 {item.product?.name}
+                                    </p>
+
+                                    <p className="text-sm text-slate-500">
+                                        {new Date(item.installationDate).toLocaleDateString()}
+                                    </p>
+
+                                </div>
+
+                                <div className="flex items-center gap-4">
+
+                                    <span className="text-sm font-semibold">
+                                        {item.status}
+                                    </span>
+
+                                    <button
+                                        onClick={() => navigate(`/installations/${item._id}`)}
+                                        className="rounded-lg bg-emerald-500 px-3 py-1 text-white hover:bg-emerald-600"
+                                    >
+                                        View
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        ))}
+
+                    </div>
+
+                </div>
+
             </div>
 
 
@@ -420,8 +513,8 @@ function InstallationDetails() {
                 <AddInstallationModal
                     setOpenModal={setOpenModal}
                     customers={customers}
-
                     products={products}
+                    employees={employees}
 
                     getInstallations={async () => {
                         const res = await fetch(

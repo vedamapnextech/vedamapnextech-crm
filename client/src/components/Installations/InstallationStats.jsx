@@ -10,6 +10,9 @@ function InstallationStats({
     pendingInstallations,
     completedInstallations,
     cancelledInstallations,
+
+    statusFilter,
+    setStatusFilter,
 }) {
 
     const cards = [
@@ -19,6 +22,7 @@ function InstallationStats({
             value: totalInstallations,
             icon: <FiTool />,
             bg: "bg-blue-500",
+            filter: "All",
         },
 
         {
@@ -26,6 +30,7 @@ function InstallationStats({
             value: pendingInstallations,
             icon: <FiClock />,
             bg: "bg-orange-500",
+            filter: "Pending",
         },
 
         {
@@ -33,6 +38,7 @@ function InstallationStats({
             value: completedInstallations,
             icon: <FiCheckCircle />,
             bg: "bg-emerald-500",
+            filter: "Completed",
         },
 
         {
@@ -40,6 +46,7 @@ function InstallationStats({
             value: cancelledInstallations,
             icon: <FiXCircle />,
             bg: "bg-red-500",
+            filter: "Cancelled",
         },
 
     ];
@@ -52,7 +59,13 @@ function InstallationStats({
 
                 <div
                     key={card.title}
-                    className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
+                    onClick={() => setStatusFilter(card.filter)}
+                    className={`cursor-pointer group rounded-3xl border bg-white p-6 shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl
+
+    ${statusFilter === card.filter
+                            ? "border-emerald-500 ring-2 ring-emerald-200"
+                            : "border-slate-200"
+                        }`}
                 >
 
                     <div className="flex items-center justify-between">

@@ -1,21 +1,25 @@
 import { useEffect, useState } from "react";
+import { FiDownload } from "react-icons/fi";
 import Select from "react-select";
 import InstallationStats from "../../components/Installations/InstallationStats";
 import InstallationTable from "../../components/Installations/InstallationTable";
 import AddInstallationModal from "../../components/Installations/AddInstallationModal";
 import DeleteConfirmationModal from "../../components/Common/DeleteConfirmationModal";
+import exportInstallationsExcel from "../../utils/exportInstallationsExcel";
 
 function Installations() {
 
   const [customers, setCustomers] = useState([]);
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const [wbFilter, setWbFilter] = useState("ALL");
   const [products, setProducts] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [installations, setInstallations] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedInstallation, setSelectedInstallation] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [customerFilter, setCustomerFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-
+  const [statusFilter, setStatusFilter] = useState("All");
   const [search, setSearch] = useState("");
   const totalInstallations = installations.length;
 
@@ -116,6 +120,21 @@ function Installations() {
 
   };
 
+
+  const getEmployees = () => {
+
+    fetch(`${import.meta.env.VITE_API_URL}/employees`)
+      .then((res) => res.json())
+      .then((data) => {
+
+        console.log("Employees :", data);
+
+        setEmployees(data);
+
+      });
+
+  };
+
   useEffect(() => {
 
     getInstallations();
@@ -123,6 +142,8 @@ function Installations() {
     getCustomers();
 
     getProducts();
+
+    getEmployees();
 
   }, []);
 
@@ -142,9 +163,8 @@ function Installations() {
 
       installation.siteName?.toLowerCase().includes(searchText) ||
 
-      installation.wbCode?.toLowerCase().includes(searchText) ||
+      installation.wbCode?.toLowerCase().includes(searchText);
 
-      installation.assetId?.toLowerCase().includes(searchText);
 
     const matchCustomer =
 
@@ -154,10 +174,9 @@ function Installations() {
 
 
     const matchStatus =
-
-      statusFilter === "" ||
-
-      installation.status === statusFilter;
+      statusFilter === "All"
+        ? true
+        : installation.status === statusFilter;
 
     return matchSearch && matchCustomer && matchStatus;
   });
@@ -219,122 +238,82 @@ function Installations() {
         pendingInstallations={pendingInstallations}
         completedInstallations={completedInstallations}
         cancelledInstallations={cancelledInstallations}
+
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
       />
 
 
       {/* Search & Filters */}
+     <div className="mt-6 flex items-center justify-between">
 
-      <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
+  <h2 className="text-lg font-bold text-slate-700">
+    Showing {filteredInstallations.length} of {installations.length} Installations
+  </h2>
 
-        <div className="grid gap-5 lg:grid-cols-3">
+  <div className="flex items-center gap-3 relative">
 
-          <input
-            type="text"
-            placeholder="🔍 Search Customer, Product, Engineer..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="
-        rounded-2xl
-        border
-        border-slate-300
-        px-5
-        py-4
-        outline-none
-        transition
-        focus:border-emerald-500
-    "
-          />
+    <button
+      onClick={() => setShowExportMenu(!showExportMenu)}
+      className="rounded-2xl bg-emerald-600 px-6 py-3 font-semibold text-white hover:bg-emerald-700 transition"
+    >
+      Export Excel
+    </button>
 
-          <Select
-            options={[
-              {
-                value: "",
-                label: "All Customers",
-              },
-              ...customers.map((customer) => ({
-                value: customer.name,
-                label: customer.name,
-              })),
-            ]}
-            value={
-              [
-                {
-                  value: "",
-                  label: "All Customers",
-                },
-                ...customers.map((customer) => ({
-                  value: customer.name,
-                  label: customer.name,
-                })),
-              ].find((option) => option.value === customerFilter)
-            }
-            onChange={(selectedOption) =>
-              setCustomerFilter(selectedOption?.value || "")
-            }
-            placeholder="All Customers"
-            isSearchable
-          />
+    {showExportMenu && (
+      <div className="absolute right-0 top-14 w-64 rounded-2xl border border-slate-200 bg-white shadow-2xl z-50 overflow-hidden">
 
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="
-        rounded-2xl
-        border
-        border-slate-300
-        px-5
-    "
-          >
-            <option value="">All Status</option>
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-            <option value="On Hold">On Hold</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
+        <button
+          onClick={() => {
+            exportInstallationsExcel(filteredInstallations);
+            setShowExportMenu(false);
+          }}
+          className="w-full px-5 py-3 text-left hover:bg-emerald-50"
+        >
+          📄 All Installations
+        </button>
 
-        </div>
-
-      </div>
-
-
-
-      <div className="mt-6 flex items-center justify-between">
-
-        <h2 className="text-lg font-bold text-slate-700">
-
-          Showing {filteredInstallations.length} of {installations.length} Installations
-
-        </h2>
-
-        {(search || customerFilter || statusFilter) && (
+        {[...new Set(installations.map((i) => i.wbCode))].map((wb) => (
 
           <button
+            key={wb}
             onClick={() => {
+              exportInstallationsExcel(
+                filteredInstallations.filter(
+                  (i) => i.wbCode === wb
+                )
+              );
 
-              setSearch("");
-
-              setCustomerFilter("");
-
-              setStatusFilter("");
-
+              setShowExportMenu(false);
             }}
-            className="
-                rounded-xl
-                bg-slate-200
-                px-5
-                py-2
-                font-semibold
-                hover:bg-slate-300
-                duration-300
-            "
+            className="w-full px-5 py-3 text-left hover:bg-emerald-50"
           >
-            Clear Filters
+            📦 {wb}
           </button>
 
-        )}
+        ))}
 
       </div>
+    )}
+
+    {(search || customerFilter || statusFilter !== "All") && (
+
+      <button
+        onClick={() => {
+          setSearch("");
+          setCustomerFilter("");
+          setStatusFilter("All");
+        }}
+        className="rounded-2xl bg-slate-200 px-6 py-3 font-semibold hover:bg-slate-300 transition"
+      >
+        Clear Filters
+      </button>
+
+    )}
+
+  </div>
+
+</div>
 
 
 
@@ -349,6 +328,7 @@ function Installations() {
           setOpenModal={setOpenModal}
           customers={customers}
           products={products}
+          employees={employees}
           getInstallations={getInstallations}
           selectedInstallation={selectedInstallation}
         />
