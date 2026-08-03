@@ -3,6 +3,7 @@ import ProductInfoCard from "../../components/Products/ProductInfoCard";
 import { useNavigate, useParams } from "react-router-dom";
 import AddProductModal from "../../components/Products/AddProductModal";
 import DeleteConfirmationModal from "../../components/Common/DeleteConfirmationModal";
+import toast from "react-hot-toast";
 function ProductDetails() {
 
     const { id } = useParams();
@@ -28,8 +29,41 @@ function ProductDetails() {
 
     };
 
+
+    const handleDeleteProduct = async () => {
+        if (!product) return;
+
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_API_URL}/products/${product._id}`,
+                {
+                    method: "DELETE",
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                toast.error(data.message || "Failed to delete product");
+                return;
+            }
+
+            toast.success("Product deleted successfully");
+
+            setOpenDeleteModal(false);
+
+            setTimeout(() => {
+                navigate("/products");
+            }, 800);
+
+        } catch (error) {
+            console.log(error);
+            toast.error("Something went wrong");
+        }
+    };
+
     useEffect(() => {
-        getInstallation();
+        getProduct();
     }, [id]);
 
     if (!product) {
@@ -351,10 +385,9 @@ function ProductDetails() {
                         <DeleteConfirmationModal
                             open={openDeleteModal}
                             title="Delete Product"
-                            message={`Are you sure you want to delete "${selectedProduct?.name}"?`}
+                            message={`Are you sure you want to delete "${product?.name}"?`}
                             onClose={() => {
                                 setOpenDeleteModal(false);
-                                setSelectedProduct(null);
                             }}
                             onDelete={handleDeleteProduct}
                         />

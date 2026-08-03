@@ -26,13 +26,15 @@ function AddCustomerModal({
 
         gstNumber: "",
 
+        customerType: "customer",
+
         city: "",
 
         address: "",
 
         status: "Active",
 
-      
+
 
     });
 
@@ -65,7 +67,7 @@ function AddCustomerModal({
                 status:
                     selectedCustomer.status || "Active",
 
-              
+
 
             });
 
@@ -134,15 +136,11 @@ function AddCustomerModal({
     const handleSubmit = async () => {
 
         if (
-
+            !formData.wbCode.trim() ||
             !formData.name.trim() ||
-
             !formData.company.trim() ||
-
             !formData.phone.trim() ||
-
             !formData.city.trim()
-
         ) {
 
             toast.error("Please fill all required fields.");
@@ -175,40 +173,32 @@ function AddCustomerModal({
 
         try {
 
+            const token = localStorage.getItem("token");
+
             const response = await fetch(url, {
-
                 method,
-
                 headers: {
-
                     "Content-Type": "application/json",
-
+                    Authorization: `Bearer ${token}`,
                 },
-
                 body: JSON.stringify(formData),
-
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
-
-                throw new Error();
-
+                toast.error(data.message);
+                return;
             }
 
             toast.success(
-
                 selectedCustomer
-
                     ? "Customer Updated Successfully"
-
                     : "Customer Added Successfully"
-
             );
 
             getCustomers();
-
             setSelectedCustomer(null);
-
             setOpenModal(false);
 
         } catch (error) {
@@ -282,17 +272,12 @@ function AddCustomerModal({
                         </label>
 
                         <input
-
                             type="text"
-
+                            name="wbCode"
                             value={formData.wbCode}
-
-                            readOnly
-
-                            placeholder="Auto Generated"
-
-                            className="w-full rounded-2xl border bg-slate-100 px-4 py-3"
-
+                            onChange={handleChange}
+                            placeholder="Enter WB Code"
+                            className="w-full rounded-2xl border px-4 py-3"
                         />
 
                     </div>
@@ -565,7 +550,7 @@ function AddCustomerModal({
 
 
 
-               
+
                 {/* Footer */}
 
                 <div className="mt-8 flex justify-end gap-4 border-t border-slate-200 pt-6">

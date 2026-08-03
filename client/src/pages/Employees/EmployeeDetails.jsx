@@ -93,7 +93,11 @@ function EmployeeDetails() {
 
             toast.success("Employee deleted successfully.");
 
-            navigate("/employees");
+            setTimeout(() => {
+                navigate("/employees");
+            }, 400);
+
+
 
         }
 
@@ -207,11 +211,30 @@ function EmployeeDetails() {
 
                 </div>
 
-                <button
+                <div className="flex items-center gap-4">
 
-                    onClick={() => navigate("/employees")}
+                    <button
+                        onClick={() => navigate(`/employees/${employee._id}/salary`)}
+                        className="
+        mb-8
+        rounded-2xl
+        bg-emerald-500
+        px-6
+        py-3
+        font-semibold
+        text-white
+        shadow-md
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:bg-emerald-600"
+                    >
+                        💰 Salary
+                    </button>
 
-                    className="
+                    <button
+                        onClick={() => navigate("/employees")}
+                        className="
         mb-8
         flex
         items-center
@@ -229,13 +252,11 @@ function EmployeeDetails() {
         hover:-translate-y-1
         hover:bg-emerald-500
         hover:text-white"
+                    >
+                        ← Back
+                    </button>
 
-                >
-
-
-                    ← Back
-
-                </button>
+                </div>
 
             </div>
 
@@ -243,12 +264,10 @@ function EmployeeDetails() {
 
 
 
-            <div className="grid gap-8 xl:grid-cols-3">
-
+            <div className="flex flex-col gap-8">
                 {/* Employee Information */}
 
-                <div className="xl:col-span-2 rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
-
+                <div className="lg:col-span-2 rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
                     <h2 className="mb-8 text-3xl font-bold text-slate-800">
 
                         Employee Information
@@ -388,7 +407,9 @@ function EmployeeDetails() {
 
                 {/* Timeline */}
 
-                <div className="space-y-8">
+                <div className="grid gap-8 lg:grid-cols-3">
+
+                    {/* Documents */}
 
                     <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl">
 
@@ -398,17 +419,14 @@ function EmployeeDetails() {
 
                         {employee.aadhaarDocument ? (
 
-                            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+                            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
 
-                                <p className="font-semibold text-slate-700">
+                                <p className="text-lg font-semibold text-slate-800">
                                     Aadhaar Card
                                 </p>
-
-                                <div className="mt-4 flex gap-3">
-
+                                <div className="mt-4 flex flex-col gap-3">
                                     <button
                                         onClick={() => {
-
                                             setPreviewTitle("Aadhaar Card");
 
                                             setPreviewFile(
@@ -416,16 +434,14 @@ function EmployeeDetails() {
                                             );
 
                                             setOpenPreview(true);
-
                                         }}
-                                        className="rounded-xl bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600"
+                                        className=" w-full rounded-xl bg-blue-500 py-3 font-semibold text-white font-semibold text-white hover:bg-blue-600"
                                     >
                                         👁 View
                                     </button>
 
                                     <button
                                         onClick={async () => {
-
                                             const fileUrl =
                                                 `${import.meta.env.VITE_API_URL.replace("/api", "")}${employee.aadhaarDocument}`;
 
@@ -448,9 +464,8 @@ function EmployeeDetails() {
                                             link.remove();
 
                                             window.URL.revokeObjectURL(url);
-
                                         }}
-                                        className="rounded-xl bg-emerald-500 px-2 py-2 font-semibold text-white hover:bg-emerald-600"
+                                        className="w-full rounded-xl bg-emerald-500 py-3 font-semibold text-white font-semibold text-white hover:bg-emerald-600"
                                     >
                                         ⬇ Download
                                     </button>
@@ -462,19 +477,20 @@ function EmployeeDetails() {
                         ) : (
 
                             <div className="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-slate-500">
-
                                 No Aadhaar Uploaded
-
                             </div>
 
                         )}
 
                     </div>
 
-                    <EmployeeTimeline employee={employee} />
+                    {/* Timeline */}
+
+                    <div className="lg:col-span-2">
+                        <EmployeeTimeline employee={employee} />
+                    </div>
 
                 </div>
-
 
 
 

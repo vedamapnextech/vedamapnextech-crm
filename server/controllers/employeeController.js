@@ -51,15 +51,26 @@ const getEmployeeById = async (req, res) => {
 const addEmployee = async (req, res) => {
     try {
 
-        const existingEmployeeId = await Employee.findOne({
-            employeeId: req.body.employeeId,
-        });
+        // ==================== Generate Employee ID ====================
 
-        if (existingEmployeeId) {
-            return res.status(400).json({
-                message: "Employee ID already exists.",
-            });
+        const lastEmployee = await Employee.findOne()
+            .sort({ createdAt: -1 })
+            .select("employeeId");
+
+        let employeeId = "EMP-001";
+
+        if (lastEmployee?.employeeId) {
+
+            const lastNumber = parseInt(
+                lastEmployee.employeeId.replace("EMP-", ""),
+                10
+            );
+
+            employeeId = `EMP-${String(lastNumber + 1).padStart(3, "0")}`;
         }
+
+
+
 
         const existingMobile = await Employee.findOne({
             mobileNumber: req.body.mobileNumber,
@@ -81,7 +92,10 @@ const addEmployee = async (req, res) => {
             });
         }
 
-        const employee = await Employee.create(req.body);
+        const employee = await Employee.create({
+            ...req.body,
+            employeeId,
+        });
 
         res.status(201).json(employee);
 

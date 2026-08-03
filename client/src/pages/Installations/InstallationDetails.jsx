@@ -1,4 +1,4 @@
-
+import exportInstallationPDF from "../../utils/exportInstallationPDF";
 import AddInstallationModal from "../../components/Installations/AddInstallationModal";
 
 import DeleteConfirmationModal from "../../components/Common/DeleteConfirmationModal";
@@ -37,47 +37,80 @@ function InstallationDetails() {
     const [installation, setInstallation] = useState(null);
     const [customers, setCustomers] = useState([]);
     const [products, setProducts] = useState([]);
+    const [dealerCustomers, setDealerCustomers] = useState([]);
+    const token = localStorage.getItem("token");
 
     const handleDelete = async () => {
+        if (!installation) return;
+
         try {
-            await fetch(
+            const response = await fetch(
                 `${import.meta.env.VITE_API_URL}/installations/${installation._id}`,
                 {
                     method: "DELETE",
                 }
             );
 
-            setOpenDeleteModal(false);
+            const data = await response.json();
 
-            toast.success("Installation deleted successfully.");
+            if (!response.ok) {
+                toast.error(data.message || "Failed to delete installation");
+                return;
+            }
+
+            toast.success("Installation deleted successfully");
+
+            setOpenDeleteModal(false);
 
             setTimeout(() => {
                 navigate("/installations");
-            }, 500);
+            }, 800);
 
         } catch (error) {
             console.log(error);
+            toast.error("Something went wrong");
         }
     };
 
 
 
     const getCustomers = () => {
-        fetch(`${import.meta.env.VITE_API_URL}/customers`)
+        fetch(`${import.meta.env.VITE_API_URL}/customers`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
             .then((res) => res.json())
             .then((data) => setCustomers(data));
     };
 
     const getProducts = () => {
-        fetch(`${import.meta.env.VITE_API_URL}/products`)
+        fetch(`${import.meta.env.VITE_API_URL}/products`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
             .then((res) => res.json())
             .then((data) => setProducts(data));
     };
 
+    const getDealerCustomers = () => {
+        fetch(`${import.meta.env.VITE_API_URL}/dealer-customers`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+            .then((res) => res.json())
+            .then((data) => setDealerCustomers(data));
+    };
 
 
     const getEmployees = () => {
-        fetch(`${import.meta.env.VITE_API_URL}/employees`)
+        fetch(`${import.meta.env.VITE_API_URL}/employees`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
             .then((res) => res.json())
             .then((data) => {
                 setEmployees(data);
@@ -109,7 +142,11 @@ function InstallationDetails() {
 
 
     useEffect(() => {
-        fetch(`${import.meta.env.VITE_API_URL}/installations/${id}`)
+        fetch(`${import.meta.env.VITE_API_URL}/installations/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
             .then((res) => res.json())
             .then((data) => {
 
@@ -125,6 +162,7 @@ function InstallationDetails() {
 
         getEmployees();
         getCustomers();
+        getDealerCustomers();
         getProducts();
 
     }, [id]);
@@ -175,15 +213,15 @@ function InstallationDetails() {
         >
             <div className="flex items-center gap-5">
                 <div
-                    className={`h-20 w-20 rounded-3xl ${iconBg} flex items-center justify-center text-4xl transition-all duration-300 group-hover:rotate-12`}
+                    className={`h-16 w-16 rounded-3xl ${iconBg} flex items-center justify-center text-3xl transition-all duration-300 group-hover:rotate-12`}
                 >
                     {icon}
                 </div>
 
                 <div>
-                    <p className="text-lg text-slate-500">{title}</p>
+                    <p className=" text-sm text-slate-500">{title}</p>
 
-                    <h2 className="text-4xl font-extrabold text-slate-800">
+                    <h2 className="text-3xl font-extrabold text-slate-800">
                         {value || "-"}
                     </h2>
 
@@ -194,34 +232,65 @@ function InstallationDetails() {
     );
 
     return (
-        <div className="min-h-screen bg-slate-100 p-8">
-            {/* Back */}
+        <div className="min-h-screen bg-slate-100 p-6">
 
-            <button
-               onClick={() => navigate("/installations")}
-                className="
-        mb-8
-        flex
-        items-center
-        gap-3
-        rounded-2xl
-        border
-        border-slate-300
-        bg-white
-        px-6
-        py-3
-        font-semibold
-        shadow-md
-        transition-all
-        duration-300
-        hover:-translate-y-1
-        hover:bg-emerald-500
-        hover:text-white
-      "
-            >
-                <FiArrowLeft />
-                Back
-            </button>
+
+
+            {/* Back */}
+            <div className="mb-8 flex items-center justify-between">
+
+                <button
+                    onClick={() => navigate("/installations")}
+                    className="
+            flex
+            items-center
+            gap-3
+            rounded-2xl
+            border
+            border-slate-300
+            bg-white
+            px-6
+            py-3
+            font-semibold
+            shadow-md
+            transition-all
+            duration-300
+            hover:-translate-y-1
+            hover:bg-emerald-500
+            hover:text-white
+        "
+                >
+                    <FiArrowLeft />
+                    Back
+                </button>
+
+                <button
+                    onClick={() => exportInstallationPDF(installation)}
+                    className="
+            flex
+            items-center
+            gap-3
+            rounded-2xl
+            bg-blue-500
+            px-6
+            py-3
+            font-semibold
+            text-white
+            shadow-md
+            transition-all
+            duration-300
+            hover:-translate-y-1
+            hover:bg-blue-600
+        "
+                >
+                    📄 Download PDF
+                </button>
+
+            </div>
+
+
+
+
 
             {/* Hero */}
 
@@ -232,7 +301,7 @@ function InstallationDetails() {
         from-emerald-600
         via-green-500
         to-teal-500
-        p-12
+      p-6
         text-white
         shadow-2xl
       "
@@ -243,17 +312,17 @@ function InstallationDetails() {
                             Installation Management
                         </p>
 
-                        <h1 className="mt-3 text-6xl font-black">
+                        <h1 className="mt-3 text-5xl font-black">
                             Installation Details
                         </h1>
 
-                        <p className="mt-4 text-xl opacity-90">
+                        <p className="mt-4 text-lg opacity-90">
                             Complete installation information for Vedamap Nextech.
                         </p>
                     </div>
 
                     <span
-                        className={`rounded-2xl px-8 py-5 text-3xl font-bold ${statusColor}`}
+                        className={`rounded-2xl px-6 py-3 text-xl rounded-xl font-bold ${statusColor}`}
                     >
                         {installation.status}
                     </span>
@@ -379,7 +448,7 @@ function InstallationDetails() {
       "
             >
                 <div className="mb-6 flex items-center gap-4">
-                    <div className="rounded-2xl bg-emerald-100 p-5 text-3xl text-emerald-600">
+                    <div className="rounded-2xl bg-emerald-100 p-5 text-2xl text-emerald-600">
                         <FiFileText />
                     </div>
 
@@ -394,7 +463,7 @@ function InstallationDetails() {
                     </div>
                 </div>
 
-                <div className="rounded-2xl bg-slate-50 p-6 text-lg leading-8 text-slate-700">
+                <div className="rounded-2xl bg-slate-50 p-5 text-lg leading-8 text-slate-700">
                     {installation.remarks || "No remarks available."}
                 </div>
             </div>
@@ -412,43 +481,65 @@ function InstallationDetails() {
 
                     <div className="mt-6 space-y-3">
 
-                        {otherInstallations.map((item) => (
+                        {otherInstallations.length === 0 ? (
 
-                            <div
-                                key={item._id}
-                                className="flex items-center justify-between rounded-2xl border border-slate-200 p-4 hover:bg-slate-50"
-                            >
+                            <div className="flex h-72 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50">
 
-                                <div>
-
-                                    <p className="font-semibold">
-                                        📦 {item.product?.name}
-                                    </p>
-
-                                    <p className="text-sm text-slate-500">
-                                        {new Date(item.installationDate).toLocaleDateString()}
-                                    </p>
-
+                                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 text-3xl">
+                                    📦
                                 </div>
 
-                                <div className="flex items-center gap-4">
+                                <h3 className="text-xl font-bold text-slate-700">
+                                    No Other Installations
+                                </h3>
 
-                                    <span className="text-sm font-semibold">
-                                        {item.status}
-                                    </span>
-
-                                    <button
-                                        onClick={() => navigate(`/installations/${item._id}`)}
-                                        className="rounded-lg bg-emerald-500 px-3 py-1 text-white hover:bg-emerald-600"
-                                    >
-                                        View
-                                    </button>
-
-                                </div>
+                                <p className="mt-2 max-w-xs text-center text-sm text-slate-500">
+                                    This WB Code currently has only one installation.
+                                </p>
 
                             </div>
 
-                        ))}
+                        ) : (
+
+                            otherInstallations.map((item) => (
+
+                                <div
+                                    key={item._id}
+                                    className="flex items-center justify-between rounded-2xl border border-slate-200 p-4 hover:bg-slate-50"
+                                >
+
+                                    <div>
+
+                                        <p className="font-semibold">
+                                            📦 {item.product?.name}
+                                        </p>
+
+                                        <p className="text-sm text-slate-500">
+                                            {new Date(item.installationDate).toLocaleDateString()}
+                                        </p>
+
+                                    </div>
+
+                                    <div className="flex items-center gap-4">
+
+                                        <span className="text-sm font-semibold">
+                                            {item.status}
+                                        </span>
+
+                                        <button
+                                            onClick={() => navigate(`/installations/${item._id}`)}
+                                            className="rounded-lg bg-emerald-500 px-3 py-1 text-white hover:bg-emerald-600"
+                                        >
+                                            View
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            ))
+
+                        )}
 
                     </div>
 
@@ -484,6 +575,9 @@ function InstallationDetails() {
                     Edit Installation
                 </button>
 
+
+
+
                 <button
                     onClick={() => setOpenDeleteModal(true)}
                     className="
@@ -515,6 +609,7 @@ function InstallationDetails() {
                     customers={customers}
                     products={products}
                     employees={employees}
+                    dealerCustomers={dealerCustomers}
 
                     getInstallations={async () => {
                         const res = await fetch(

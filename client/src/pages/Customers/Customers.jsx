@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import LeadTable from "../../components/Customers/LeadTable";
 import StatCard from "../../components/Dashboard/StatCard";
@@ -25,33 +24,47 @@ function Customers() {
   const [city, setCity] = useState("");
 
   const getCustomers = (
+
     searchText = "",
     statusText = "",
     cityText = ""
   ) => {
+    const token = localStorage.getItem("token");
     console.log(import.meta.env.VITE_API_URL);
-    fetch(`${import.meta.env.VITE_API_URL}/leads?search=${searchText}&status=${statusText}&city=${cityText}`)
+    fetch(
+      `${import.meta.env.VITE_API_URL}/leads?search=${searchText}&status=${statusText}&city=${cityText}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
       .then((response) => response.json())
       .then((data) => {
-        setCustomers(data.reverse());
+        if (Array.isArray(data)) {
+          setCustomers(data.reverse());
+        } else {
+          console.log(data);
+          setCustomers([]);
+        }
       });
-
   };
-
-
   const getActualCustomers = () => {
+    const token = localStorage.getItem("token");
 
-    fetch(`${import.meta.env.VITE_API_URL}/customers`)
+    fetch(`${import.meta.env.VITE_API_URL}/customers`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
-
         setActualCustomers(data);
-
       });
-
   };
 
   const handleDeleteCustomer = async () => {
+    const token = localStorage.getItem("token");
 
     if (!selectedCustomer) return;
 
@@ -61,14 +74,16 @@ function Customers() {
 
         `${import.meta.env.VITE_API_URL}/leads/${selectedCustomer._id}`,
 
+
         {
-
           method: "DELETE",
-
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
 
-      );
 
+      );
       const data = await response.json();
 
       if (!response.ok) {

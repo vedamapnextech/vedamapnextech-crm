@@ -2,30 +2,12 @@ const Customer = require("../models/Customer");
 const CustomerProduct = require("../models/CustomerProduct");
 const Installation = require("../models/Installation");
 
-const generateWBCode = async () => {
 
-    const lastCustomer = await Customer.findOne()
-        .sort({ createdAt: -1 });
-
-    if (!lastCustomer || !lastCustomer.wbCode) {
-
-        return "WB000001";
-
-    }
-
-    const lastNumber = parseInt(
-        lastCustomer.wbCode.replace("WB", "")
-    );
-
-    const nextNumber = lastNumber + 1;
-
-    return `WB${String(nextNumber).padStart(6, "0")}`;
-
-};
 
 const getCustomers = async (req, res) => {
     try {
         const { search, status, city } = req.query;
+
 
         let filter = {};
 
@@ -53,7 +35,6 @@ const getCustomers = async (req, res) => {
         const customers = await Customer.find(filter).sort({
             createdAt: -1,
         });
-
         res.json(customers);
     } catch (error) {
         console.log(error);
@@ -63,20 +44,25 @@ const getCustomers = async (req, res) => {
         });
     }
 };
-
 const addCustomer = async (req, res) => {
     try {
 
-        const wbCode = await generateWBCode();
-
-        const customer = await Customer.create({
-
-            ...req.body,
-
-            wbCode,
-
+        // Same WB Code allow nahi hoga
+        const existingCustomer = await Customer.findOne({
+            wbCode: req.body.wbCode,
         });
 
+        if (existingCustomer) {
+            return res.status(400).json({
+                message: "WB Code already exists",
+            });
+        }
+
+        
+        // Manual WB Code save hoga
+        const customer = await Customer.create(req.body);
+
+       
         res.status(201).json(customer);
 
     } catch (error) {
@@ -89,7 +75,6 @@ const addCustomer = async (req, res) => {
 
     }
 };
-
 const getCustomerById = async (req, res) => {
     try {
         const customer = await Customer.findById(req.params.id);
@@ -193,23 +178,15 @@ const convertLeadToCustomer = async (req, res) => {
 
         }
 
-        const wbCode = await generateWBCode();
-
         const customer = await Customer.create({
-
-            wbCode,
-
+            wbCode: `WB-${Math.floor(Math.random() * 100000)}`,
             name: lead.name,
             company: lead.company,
             contactPerson: lead.name,
             phone: lead.phone,
             city: lead.city,
             address: lead.address,
-
-            customerType: "Company",
-
             status: "Active",
-
         });
 
         await Lead.findByIdAndDelete(req.params.id);

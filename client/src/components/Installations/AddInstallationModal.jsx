@@ -9,6 +9,8 @@ function AddInstallationModal({
 
     customers,
 
+    dealerCustomers,
+
     products,
 
     employees,
@@ -21,6 +23,8 @@ function AddInstallationModal({
     const [installationData, setInstallationData] = useState({
 
         customer: "",
+
+        customerType: "Customer",
 
         product: "",
 
@@ -97,12 +101,31 @@ function AddInstallationModal({
                 employee.role === "Engineer"
         )
         .map((employee) => ({
+            id: employee._id,
             value: employee.fullName,
             label: employee.fullName,
         }));
 
-
-
+    const customerOptions = [
+        {
+            label: "Customer",
+            options: customers.map((customer) => ({
+                value: customer._id,
+                label: `${customer.name} (${customer.wbCode})`,
+                wbCode: customer.wbCode,
+                type: "Customer",
+            })),
+        },
+        {
+            label: "Dealer Customer",
+            options: dealerCustomers.map((customer) => ({
+                value: customer._id,
+                label: `${customer.name} (${customer.wbCode})`,
+                wbCode: customer.wbCode,
+                type: "DealerCustomer",
+            })),
+        },
+    ];
 
     const handleChange = (e) => {
 
@@ -125,6 +148,8 @@ function AddInstallationModal({
     const resetForm = () => {
         setInstallationData({
             customer: "",
+            customerType: "Customer",
+
             product: "",
             wbCode: "",
 
@@ -318,42 +343,34 @@ function AddInstallationModal({
                                 Customer <span className="text-red-500">*</span>
                             </label>
 
+
+
+
                             <Select
-                                options={customers.map((customer) => ({
-                                    value: customer._id,
-                                    label: `${customer.name} (${customer.city})`,
-                                }))}
-
+                                options={customerOptions}
                                 value={
-                                    customers
-                                        .map((customer) => ({
-                                            value: customer._id,
-                                            label: `${customer.name} (${customer.city})`,
-                                        }))
-                                        .find(
-                                            (option) => option.value === installationData.customer
-                                        ) || null
+                                    customerOptions
+                                        .flatMap((group) => group.options)
+                                        .find((option) => option.value === installationData.customer) || null
                                 }
-
                                 onChange={(selectedOption) => {
 
-                                    const selectedCustomer = customers.find(
-                                        (c) => c._id === selectedOption?.value
-                                    );
+                                    const selectedCustomer =
+                                        customers.find((c) => c._id === selectedOption?.value) ||
+                                        dealerCustomers.find((c) => c._id === selectedOption?.value);
+
                                     setInstallationData({
                                         ...installationData,
                                         customer: selectedOption?.value || "",
+                                        customerType: selectedOption?.type || "Customer",
                                         wbCode: selectedCustomer?.wbCode || "",
                                         siteName: selectedInstallation
                                             ? installationData.siteName
                                             : "",
                                     });
-
                                 }}
-                                placeholder="Select Customer"
-
+                                placeholder="Search Customer / Dealer Customer"
                                 isSearchable
-
                                 className="text-sm"
                             />
 
@@ -492,7 +509,7 @@ function AddInstallationModal({
                             <datalist id="engineers">
                                 {engineerOptions.map((engineer) => (
                                     <option
-                                        key={engineer.value}
+                                        key={engineer.id}
                                         value={engineer.value}
                                     />
                                 ))}

@@ -1,4 +1,6 @@
 const Installation = require("../models/Installation");
+const Customer = require("../models/Customer");
+const DealerCustomer = require("../models/DealerCustomer");
 
 // ==================== Get All Installations ====================
 
@@ -6,11 +8,37 @@ const getInstallations = async (req, res) => {
     try {
 
         const installations = await Installation.find()
-            .populate("customer", "name")
             .populate("product", "name")
             .sort({ createdAt: -1 });
 
-        res.json(installations);
+        const data = await Promise.all(
+            installations.map(async (installation) => {
+
+                let customer = null;
+
+                if (installation.customerType === "DealerCustomer") {
+
+                    customer = await DealerCustomer.findById(
+                        installation.customer
+                    ).select("name wbCode");
+
+                } else {
+
+                    customer = await Customer.findById(
+                        installation.customer
+                    ).select("name wbCode");
+
+                }
+
+                return {
+                    ...installation.toObject(),
+                    customer,
+                };
+
+            })
+        );
+
+        res.json(data);
 
     } catch (error) {
 
@@ -28,39 +56,47 @@ const getInstallations = async (req, res) => {
 // ==================== Get Single Installation ====================
 
 const getInstallationById = async (req, res) => {
-
     try {
 
         const installation = await Installation.findById(req.params.id)
-            .populate("customer")
             .populate("product");
 
         if (!installation) {
-
             return res.status(404).json({
-
                 message: "Installation Not Found",
-
             });
+        }
+
+        let customer = null;
+
+        if (installation.customerType === "DealerCustomer") {
+
+            customer = await DealerCustomer.findById(
+                installation.customer
+            ).select("name city wbCode");
+
+        } else {
+
+            customer = await Customer.findById(
+                installation.customer
+            ).select("name city wbCode");
 
         }
 
-        res.json(installation);
+        res.json({
+            ...installation.toObject(),
+            customer,
+        });
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.log(error);
 
         res.status(500).json({
-
             message: "Server Error",
-
         });
 
     }
-
 };
 
 

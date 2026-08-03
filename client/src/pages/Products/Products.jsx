@@ -3,8 +3,10 @@ import SkeletonCard from "../../components/Common/SkeletonCard";
 import ProductStats from "../../components/Products/ProductStats";
 import exportProductsExcel from "../../utils/exportProductsExcel";
 import ProductTable from "../../components/Products/ProductTable";
+import toast from "react-hot-toast";
 import AddProductModal from "../../components/Products/AddProductModal";
 import DeleteConfirmationModal from "../../components/Common/DeleteConfirmationModal";
+
 import {
   FiSearch,
   FiPackage,
@@ -19,6 +21,8 @@ import {
 
 function Products() {
   const [products, setProducts] = useState([]);
+
+
   const [loading, setLoading] = useState(true);
 
   const totalProducts = products.length;
@@ -76,11 +80,9 @@ function Products() {
 
 
   const handleDeleteProduct = async () => {
-
     if (!selectedProduct) return;
 
     try {
-
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/products/${selectedProduct._id}`,
         {
@@ -91,21 +93,22 @@ function Products() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message);
+        toast.error(data.message || "Failed to delete product");
+        return;
       }
 
-      getProducts();
+      toast.success("Product deleted successfully");
+
+      getProducts(false);
 
       setOpenDeleteModal(false);
 
       setSelectedProduct(null);
 
     } catch (error) {
-
       console.log(error);
-
+      toast.error("Something went wrong");
     }
-
   };
 
 

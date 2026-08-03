@@ -2,9 +2,12 @@
 // Improve Mobile Responsiveness
 // =============================================
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useSearchParams } from "react-router-dom";
 import Select from "react-select";
 
 import SkeletonCard from "../../components/Common/SkeletonCard";
+
 import exportEmployeesExcel from "../../utils/exportEmployeesExcel"
 import EmployeeStats from "../../components/Employees/EmployeeStats";
 import EmployeeTable from "../../components/Employees/EmployeeTable";
@@ -16,6 +19,7 @@ function Employees() {
   const [employees, setEmployees] = useState([]);
 
   const [openModal, setOpenModal] = useState(false);
+  const [searchParams] = useSearchParams();
 
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
@@ -26,6 +30,8 @@ function Employees() {
   const [departmentFilter, setDepartmentFilter] = useState("");
 
   const [statusFilter, setStatusFilter] = useState("");
+
+  const [selectedStat, setSelectedStat] = useState("");
 
   const [roleFilter, setRoleFilter] = useState("");
   const [loading, setLoading] = useState(true);
@@ -60,20 +66,22 @@ function Employees() {
   // ================= Delete =================
 
   const handleDelete = async () => {
-
     try {
-
-      await fetch(
-
+      const response = await fetch(
         `${import.meta.env.VITE_API_URL}/employees/${selectedEmployee._id}`,
-
         {
-
           method: "DELETE",
-
         }
-
       );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.message || "Failed to delete employee");
+        return;
+      }
+
+      toast.success("Employee deleted successfully");
 
       getEmployees();
 
@@ -81,16 +89,11 @@ function Employees() {
 
       setSelectedEmployee(null);
 
-    }
-
-    catch (error) {
-
+    } catch (error) {
       console.log(error);
-
+      toast.error("Something went wrong");
     }
-
   };
-
   // ================= Stats =================
 
   const totalEmployees = employees.length;
@@ -107,10 +110,8 @@ function Employees() {
 
   ).length;
 
-  const engineers = employees.filter(
-
-    (e) => e.role === "Engineer"
-
+  const engineers = employees.filter((e) =>
+    e.designation?.toLowerCase().includes("engineer")
   ).length;
 
   // ================= Filters =================
@@ -148,11 +149,8 @@ function Employees() {
       employee.status === statusFilter;
 
     const matchRole =
-
       roleFilter === "" ||
-
-      employee.role === roleFilter;
-
+      employee.designation?.toLowerCase().includes(roleFilter.toLowerCase());
     return (
       matchSearch &&
       matchDepartment &&
@@ -161,6 +159,16 @@ function Employees() {
     );
 
   });
+
+  useEffect(() => {
+    const status = searchParams.get("status");
+
+    if (status === "Active") {
+      setStatusFilter(status);
+    } else {
+      setStatusFilter("");
+    }
+  }, [searchParams]);
 
   return (
 
@@ -232,6 +240,10 @@ function Employees() {
           activeEmployees={activeEmployees}
           inactiveEmployees={inactiveEmployees}
           engineers={engineers}
+          selectedStat={selectedStat}
+          setSelectedStat={setSelectedStat}
+          setStatusFilter={setStatusFilter}
+          setRoleFilter={setRoleFilter}
         />
 
       )}
@@ -240,7 +252,7 @@ function Employees() {
 
       <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4 items-center">
           <input
 
             type="text"
@@ -340,17 +352,22 @@ function Employees() {
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="
-        rounded-2xl
-        border
-        border-slate-300
-        px-5
-    "
-          >
+            className="h-14 w-full rounded-2xl border border-slate-300 px-5 text-lg outline-none transition focus:border-emerald-500"          >
             <option value="">All Roles</option>
-            <option value="Admin">Admin</option>
-            <option value="Manager">Manager</option>
-            <option value="Engineer">Engineer</option>
+
+            {Array.from(
+              new Set(
+                employees
+                  .map((employee) => employee.role?.trim())
+                  .filter(Boolean)
+              )
+            )
+              .sort()
+              .map((role) => (
+                <option key={role} value={role}>
+                  {role}
+                </option>
+              ))}
           </select>
 
 
@@ -364,8 +381,7 @@ function Employees() {
 
             }
 
-            className="rounded-2xl border border-slate-300 px-5"
-
+            className="h-14 w-full rounded-2xl border border-slate-300 px-5 text-lg outline-none transition focus:border-emerald-500"
           >
 
             <option value="">All Status</option>
@@ -402,6 +418,8 @@ function Employees() {
                 setDepartmentFilter("");
 
                 setStatusFilter("");
+
+                setSelectedStat("");
 
               }}
               className="rounded-xl bg-slate-200 px-5 py-2 font-semibold transition hover:bg-slate-300"

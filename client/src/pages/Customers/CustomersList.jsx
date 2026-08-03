@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import exportCustomersExcel from "../../utils/exportCustomersExcel";
 import ExportCustomersModal from "../../components/Customers/ExportCustomersModal";
+import toast from "react-hot-toast";
 
 import CustomerTable from "../../components/Customers/CustomerTable";
 import AddCustomerModal from "../../components/Customers/AddCustomerModal";
@@ -21,6 +22,7 @@ function CustomersList() {
     const [status, setStatus] = useState("");
     const [city, setCity] = useState("");
     const navigate = useNavigate();
+    const token = localStorage.getItem("token");
     const [customers, setCustomers] = useState([]);
     const [openModal, setOpenModal] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -33,12 +35,22 @@ function CustomersList() {
     ) => {
 
         fetch(
-            `${import.meta.env.VITE_API_URL}/customers?search=${searchText}&status=${statusText}&city=${cityText}`
+            `${import.meta.env.VITE_API_URL}/customers?search=${searchText}&status=${statusText}&city=${cityText}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
         )
             .then((res) => res.json())
             .then((data) => {
 
-                setCustomers(data);
+                if (Array.isArray(data)) {
+                    setCustomers(data);
+                } else {
+                    setCustomers([]);
+                    console.log(data);
+                }
 
             });
 
@@ -47,41 +59,38 @@ function CustomersList() {
 
 
     const handleDeleteCustomer = async () => {
-
         if (!selectedCustomer) return;
 
         try {
-
             const response = await fetch(
-
                 `${import.meta.env.VITE_API_URL}/customers/${selectedCustomer._id}`,
-
                 {
                     method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
-
             );
 
             const data = await response.json();
 
             if (!response.ok) {
-
-                throw new Error(data.message);
-
+                toast.error(data.message || "Failed to delete customer");
+                return;
             }
 
-            getCustomers();
+            toast.success("Customer deleted successfully");
+
+            getCustomers(search, status, city);
 
             setIsDeleteModalOpen(false);
 
             setSelectedCustomer(null);
 
         } catch (error) {
-
             console.log(error);
-
+            toast.error("Something went wrong");
         }
-
     };
 
 
@@ -339,7 +348,7 @@ function CustomersList() {
                 />
 
             )}
-            
+
             <ExportCustomersModal
                 open={openExportModal}
                 onClose={() => setOpenExportModal(false)}

@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { HiOutlineBars3 } from "react-icons/hi2";
 import { MdManageAccounts } from "react-icons/md";
+import { MdStore } from "react-icons/md";
 
 import {
   MdDashboard,
@@ -83,6 +84,18 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
         </NavLink>
 
         <NavLink
+          to="/dealers"
+          className={`${menuStyle} ${isSidebarOpen ? "justify-start" : "justify-center"
+            }`}
+        >
+          <MdStore className="text-[24px] shrink-0 group-hover:scale-110 transition-transform duration-300" />
+
+          {isSidebarOpen && (
+            <span className="text-[17px]">Dealers</span>
+          )}
+        </NavLink>
+
+        <NavLink
           to="/products"
           className={`${menuStyle} ${isSidebarOpen ? "justify-start" : "justify-center"
             }`}
@@ -106,7 +119,12 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
           )}
         </NavLink>
 
-        <NavLink
+
+
+
+
+
+        {/* <NavLink
           to="/support"
           className={`${menuStyle} ${isSidebarOpen ? "justify-start" : "justify-center"
             }`}
@@ -116,7 +134,12 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
           {isSidebarOpen && (
             <span className="text-[17px]">Support</span>
           )}
-        </NavLink>
+        </NavLink> */}
+
+
+
+
+
 
         <NavLink
           to="/employees"
@@ -129,7 +152,8 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
           )}
         </NavLink>
 
-        <NavLink
+
+        {/* <NavLink
           to="/reports"
           className={`${menuStyle} ${isSidebarOpen ? "justify-start" : "justify-center"
             }`}
@@ -139,7 +163,12 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
           {isSidebarOpen && (
             <span className="text-[17px]">Reports</span>
           )}
-        </NavLink>
+        </NavLink> */}
+
+
+
+
+
 
         <NavLink
           to="/settings"
@@ -157,11 +186,6 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
 
 
       {/* Bottom Profile */}
-
-
-
-
-
 
       {/* {isSidebarOpen && (
         <div className="p-3">

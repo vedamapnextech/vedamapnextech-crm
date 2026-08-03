@@ -8,6 +8,12 @@ const installationSchema = new mongoose.Schema(
       required: true,
     },
 
+    customerType: {
+      type: String,
+      enum: ["Customer", "DealerCustomer"],
+      default: "Customer",
+    },
+
     product: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",

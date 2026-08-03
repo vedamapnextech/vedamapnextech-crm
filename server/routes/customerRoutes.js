@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
+const authMiddleware = require("../middlewares/authMiddleware");
+
 const {
     getCustomers,
     addCustomer,
@@ -10,10 +12,11 @@ const {
     convertLeadToCustomer,
 } = require("../controllers/customerController");
 
-router.get("/", getCustomers);
-router.post("/", addCustomer);
-router.get("/:id", getCustomerById);
-router.put("/:id", updateCustomer);
-router.delete("/:id", deleteCustomer);
-router.post("/convert/:id", convertLeadToCustomer);
+router.get("/", authMiddleware, getCustomers);
+router.post("/", authMiddleware, addCustomer);
+router.get("/:id", authMiddleware, getCustomerById);
+router.put("/:id", authMiddleware, updateCustomer);
+router.delete("/:id", authMiddleware, deleteCustomer);
+router.post("/convert/:id", authMiddleware, convertLeadToCustomer);
+
 module.exports = router;

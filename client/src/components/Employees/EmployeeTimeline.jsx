@@ -44,39 +44,38 @@ function EmployeeTimeline({ employee }) {
 
     return (
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl">
 
-            <h2 className="mb-8 text-3xl font-bold text-slate-800">
+            <h2 className="mb-6 text-2xl font-bold text-slate-800">
                 Employee Timeline
             </h2>
 
-            <div className="space-y-8">
+            <div className="space-y-5">
 
                 {timeline.map((item, index) => (
 
-                    <div key={index} className="flex gap-5">
+                    <div key={index} className="flex gap-4">
 
                         <div className="flex flex-col items-center">
 
                             <div
-                                className={`${item.color} flex h-14 w-14 items-center justify-center rounded-full text-xl text-white`}
-                            >
+                                className={`${item.color} flex h-10 w-10 items-center justify-center rounded-full text-base text-white`}                            >
                                 {item.icon}
                             </div>
 
                             {index !== timeline.length - 1 && (
-                                <div className="h-16 w-1 bg-slate-200"></div>
+                                <div className="h-10 w-0.5 bg-slate-200"></div>
                             )}
 
                         </div>
 
-                        <div className="pt-2">
+                        <div className="pt-1">
 
-                            <h3 className="text-xl font-bold text-slate-800">
+                            <h3 className="text-xl font-semibold text-slate-800">
                                 {item.title}
                             </h3>
 
-                            <p className="mt-2 text-slate-500">
+                            <p className="mt-1 text-sm text-slate-500">
                                 {item.value}
                             </p>
 

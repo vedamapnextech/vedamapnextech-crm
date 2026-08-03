@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { FiDownload } from "react-icons/fi";
+import toast from "react-hot-toast";
 import Select from "react-select";
 import InstallationStats from "../../components/Installations/InstallationStats";
 import InstallationTable from "../../components/Installations/InstallationTable";
@@ -10,6 +11,7 @@ import exportInstallationsExcel from "../../utils/exportInstallationsExcel";
 function Installations() {
 
   const [customers, setCustomers] = useState([]);
+  const [dealerCustomers, setDealerCustomers] = useState([]);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [wbFilter, setWbFilter] = useState("ALL");
   const [products, setProducts] = useState([]);
@@ -21,6 +23,7 @@ function Installations() {
   const [customerFilter, setCustomerFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [search, setSearch] = useState("");
+
   const totalInstallations = installations.length;
 
   const pendingInstallations = installations.filter(
@@ -39,7 +42,13 @@ function Installations() {
 
   const getInstallations = () => {
 
-    fetch(`${import.meta.env.VITE_API_URL}/installations`)
+    const token = localStorage.getItem("token");
+
+    fetch(`${import.meta.env.VITE_API_URL}/installations`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
 
@@ -55,35 +64,39 @@ function Installations() {
 
 
   const handleDelete = async () => {
+    if (!selectedInstallation) return;
 
     try {
+      const token = localStorage.getItem("token");
 
-      await fetch(
-
+      const response = await fetch(
         `${import.meta.env.VITE_API_URL}/installations/${selectedInstallation._id}`,
-
         {
-
           method: "DELETE",
-
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-
       );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.message || "Failed to delete installation");
+        return;
+      }
+
+      toast.success("Installation deleted successfully");
 
       getInstallations();
 
       setOpenDeleteModal(false);
-
       setSelectedInstallation(null);
 
-    }
-
-    catch (error) {
-
+    } catch (error) {
       console.log(error);
-
+      toast.error("Something went wrong");
     }
-
   };
 
 
@@ -92,23 +105,61 @@ function Installations() {
 
   const getCustomers = () => {
 
-    fetch(`${import.meta.env.VITE_API_URL}/customers`)
+    const token = localStorage.getItem("token");
+
+    fetch(`${import.meta.env.VITE_API_URL}/customers`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
 
         console.log("Customers :", data);
 
-        setCustomers(data);
+        setCustomers(Array.isArray(data) ? data : []);
 
       });
 
   };
 
+
+  // ================= Dealer Customers =================
+
+  const getDealerCustomers = () => {
+
+    const token = localStorage.getItem("token");
+
+    fetch(`${import.meta.env.VITE_API_URL}/dealer-customers`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+
+        console.log("Dealer Customers :", data);
+
+        setDealerCustomers(Array.isArray(data) ? data : []);
+
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Unable to load dealer customers");
+      });
+
+  };
   // ================= Products =================
 
   const getProducts = () => {
 
-    fetch(`${import.meta.env.VITE_API_URL}/products`)
+    const token = localStorage.getItem("token");
+
+    fetch(`${import.meta.env.VITE_API_URL}/products`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
 
@@ -123,7 +174,13 @@ function Installations() {
 
   const getEmployees = () => {
 
-    fetch(`${import.meta.env.VITE_API_URL}/employees`)
+    const token = localStorage.getItem("token");
+
+    fetch(`${import.meta.env.VITE_API_URL}/employees`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
 
@@ -140,6 +197,8 @@ function Installations() {
     getInstallations();
 
     getCustomers();
+
+    getDealerCustomers();
 
     getProducts();
 
@@ -245,75 +304,75 @@ function Installations() {
 
 
       {/* Search & Filters */}
-     <div className="mt-6 flex items-center justify-between">
+      <div className="mt-6 flex items-center justify-between">
 
-  <h2 className="text-lg font-bold text-slate-700">
-    Showing {filteredInstallations.length} of {installations.length} Installations
-  </h2>
+        <h2 className="text-lg font-bold text-slate-700">
+          Showing {filteredInstallations.length} of {installations.length} Installations
+        </h2>
 
-  <div className="flex items-center gap-3 relative">
-
-    <button
-      onClick={() => setShowExportMenu(!showExportMenu)}
-      className="rounded-2xl bg-emerald-600 px-6 py-3 font-semibold text-white hover:bg-emerald-700 transition"
-    >
-      Export Excel
-    </button>
-
-    {showExportMenu && (
-      <div className="absolute right-0 top-14 w-64 rounded-2xl border border-slate-200 bg-white shadow-2xl z-50 overflow-hidden">
-
-        <button
-          onClick={() => {
-            exportInstallationsExcel(filteredInstallations);
-            setShowExportMenu(false);
-          }}
-          className="w-full px-5 py-3 text-left hover:bg-emerald-50"
-        >
-          📄 All Installations
-        </button>
-
-        {[...new Set(installations.map((i) => i.wbCode))].map((wb) => (
+        <div className="flex items-center gap-3 relative">
 
           <button
-            key={wb}
-            onClick={() => {
-              exportInstallationsExcel(
-                filteredInstallations.filter(
-                  (i) => i.wbCode === wb
-                )
-              );
-
-              setShowExportMenu(false);
-            }}
-            className="w-full px-5 py-3 text-left hover:bg-emerald-50"
+            onClick={() => setShowExportMenu(!showExportMenu)}
+            className="rounded-2xl bg-emerald-600 px-6 py-3 font-semibold text-white hover:bg-emerald-700 transition"
           >
-            📦 {wb}
+            Export Excel
           </button>
 
-        ))}
+          {showExportMenu && (
+            <div className="absolute right-0 top-14 w-64 rounded-2xl border border-slate-200 bg-white shadow-2xl z-50 overflow-hidden">
+
+              <button
+                onClick={() => {
+                  exportInstallationsExcel(filteredInstallations);
+                  setShowExportMenu(false);
+                }}
+                className="w-full px-5 py-3 text-left hover:bg-emerald-50"
+              >
+                📄 All Installations
+              </button>
+
+              {[...new Set(installations.map((i) => i.wbCode))].map((wb) => (
+
+                <button
+                  key={wb}
+                  onClick={() => {
+                    exportInstallationsExcel(
+                      filteredInstallations.filter(
+                        (i) => i.wbCode === wb
+                      )
+                    );
+
+                    setShowExportMenu(false);
+                  }}
+                  className="w-full px-5 py-3 text-left hover:bg-emerald-50"
+                >
+                  📦 {wb}
+                </button>
+
+              ))}
+
+            </div>
+          )}
+
+          {(search || customerFilter || statusFilter !== "All") && (
+
+            <button
+              onClick={() => {
+                setSearch("");
+                setCustomerFilter("");
+                setStatusFilter("All");
+              }}
+              className="rounded-2xl bg-slate-200 px-6 py-3 font-semibold hover:bg-slate-300 transition"
+            >
+              Clear Filters
+            </button>
+
+          )}
+
+        </div>
 
       </div>
-    )}
-
-    {(search || customerFilter || statusFilter !== "All") && (
-
-      <button
-        onClick={() => {
-          setSearch("");
-          setCustomerFilter("");
-          setStatusFilter("All");
-        }}
-        className="rounded-2xl bg-slate-200 px-6 py-3 font-semibold hover:bg-slate-300 transition"
-      >
-        Clear Filters
-      </button>
-
-    )}
-
-  </div>
-
-</div>
 
 
 
@@ -327,6 +386,7 @@ function Installations() {
         <AddInstallationModal
           setOpenModal={setOpenModal}
           customers={customers}
+          dealerCustomers={dealerCustomers}
           products={products}
           employees={employees}
           getInstallations={getInstallations}

@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
-import AddCustomerModal from "../components/Customers/AddCustomerModal";
-import CustomerProfileCard from "../components/Customers/CustomerProfileCard";
-import DeleteConfirmationModal from "../components/Common/DeleteConfirmationModal";
-import AddCustomerProductModal from "../components/Customers/AddCustomerProductModal";
+import AddCustomerModal from "../../components/Customers/AddCustomerModal";
+import CustomerProfileCard from "../../components/Customers/CustomerProfileCard";
+import DeleteConfirmationModal from "../../components/Common/DeleteConfirmationModal";
+import AddCustomerProductModal from "../../components/Customers/AddCustomerProductModal";
 function CustomerDetails() {
   const { id } = useParams();
   const [customer, setCustomer] = useState(null);
   const [installations, setInstallations] = useState([]);
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
   const [openModal, setOpenModal] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -17,24 +18,23 @@ function CustomerDetails() {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const handleDeleteProduct = async () => {
-
     if (!selectedProduct) return;
 
     try {
-
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/customer-products/${selectedProduct._id}`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-
         throw new Error(data.message);
-
       }
 
       toast.success("Product Deleted Successfully");
@@ -42,22 +42,21 @@ function CustomerDetails() {
       getProducts();
 
       setSelectedProduct(null);
-
       setIsDeleteModalOpen(false);
 
     } catch (error) {
-
       console.log(error);
-
       toast.error("Unable to Delete Product");
-
     }
-
   };
 
 
   const getCustomer = () => {
-    fetch(`${import.meta.env.VITE_API_URL}/customers/${id}`)
+    fetch(`${import.meta.env.VITE_API_URL}/customers/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
@@ -71,9 +70,13 @@ function CustomerDetails() {
   const getInstallations = () => {
 
     fetch(
-      `${import.meta.env.VITE_API_URL}/installations/customer/${id}`
-    )
-      .then((res) => res.json())
+      `${import.meta.env.VITE_API_URL}/installations/customer/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    ).then((res) => res.json())
       .then((data) => {
 
         setInstallations(data);
@@ -86,7 +89,12 @@ function CustomerDetails() {
   const getProducts = () => {
 
     fetch(
-      `${import.meta.env.VITE_API_URL}/customer-products/${id}`
+      `${import.meta.env.VITE_API_URL}/customer-products/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     )
       .then((res) => res.json())
       .then((data) => {
@@ -99,17 +107,22 @@ function CustomerDetails() {
   };
 
   const handleDeleteCustomer = async () => {
-
     if (!selectedCustomer) return;
 
     try {
-
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/customers/${selectedCustomer._id}`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
+
+      console.log("STATUS =", response.status);
+      console.log("OK =", response.ok);
+      console.log("HEADERS =", response.headers.get("content-type"));
 
       const data = await response.json();
 
@@ -118,20 +131,22 @@ function CustomerDetails() {
       }
 
 
-      setSelectedCustomer(null);
 
+
+
+      toast.success("Customer deleted successfully");
+
+      setSelectedCustomer(null);
       setIsDeleteModalOpen(false);
 
-
-
-      navigate("/customers-list");
+      setTimeout(() => {
+        navigate("/customers-list");
+      }, 800);
 
     } catch (error) {
-
       console.log(error);
-
+      toast.error(error.message || "Unable to delete customer");
     }
-
   };
 
 
@@ -196,40 +211,30 @@ function CustomerDetails() {
 
       <DeleteConfirmationModal
         open={isDeleteModalOpen}
-        title={
-          selectedProduct
-            ? "Delete Product"
-            : "Delete Customer"
-        }
+        title={selectedProduct ? "Delete Product" : "Delete Customer"}
         message={
           selectedProduct
             ? `Are you sure you want to delete "${selectedProduct.productName}"? This action cannot be undone.`
             : `Are you sure you want to delete "${selectedCustomer?.name}"? This action cannot be undone.`
         }
         onClose={() => {
-
           setIsDeleteModalOpen(false);
-
           setSelectedProduct(null);
-
           setSelectedCustomer(null);
-
         }}
         onDelete={() => {
+          console.log("selectedProduct =", selectedProduct);
+          console.log("selectedCustomer =", selectedCustomer);
 
           if (selectedProduct) {
-
+            console.log("CALLING PRODUCT DELETE");
             handleDeleteProduct();
-
           } else {
-
+            console.log("CALLING CUSTOMER DELETE");
             handleDeleteCustomer();
-
           }
-
         }}
       />
-
 
     </div>
   );

@@ -5,6 +5,7 @@ const customerSchema = new mongoose.Schema(
     // Customer Basic Information
     wbCode: {
       type: String,
+      required: true,
       unique: true,
       trim: true,
     },
@@ -59,24 +60,20 @@ const customerSchema = new mongoose.Schema(
     },
 
     // Business Information
-    customerType: {
-      type: String,
-      enum: ["Individual", "Company"],
-      default: "Company",
-    },
-
+  
     status: {
       type: String,
       enum: ["Active", "Inactive"],
       default: "Active",
     },
+    
     // Customer Information
     customerSince: {
       type: Date,
       default: Date.now,
     },
 
-   
+
   },
   {
     timestamps: true,

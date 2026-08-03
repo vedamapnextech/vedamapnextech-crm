@@ -57,7 +57,6 @@ function DeleteConfirmationModal({
                     >
                         {buttonText}
                     </button>
-
                 </div>
 
             </div>

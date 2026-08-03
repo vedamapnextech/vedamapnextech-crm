@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import LeadProfileCard from "../../components/Customers/LeadProfileCard";
 import AddLeadModal from "../../components/Customers/AddLeadModal";
+import toast from "react-hot-toast";
 import DeleteConfirmationModal from "../../components/Common/DeleteConfirmationModal";
 
 function LeadDetails() {
@@ -11,6 +12,7 @@ function LeadDetails() {
     const [isConvertModalOpen, setIsConvertModalOpen] = useState(false);
 
     const [openModal, setOpenModal] = useState(false);
+    const token = localStorage.getItem("token");
 
     const [selectedCustomer, setSelectedCustomer] = useState(null);
 
@@ -26,7 +28,11 @@ function LeadDetails() {
 
     const getLead = () => {
 
-        fetch(`${import.meta.env.VITE_API_URL}/leads/${id}`)
+        fetch(`${import.meta.env.VITE_API_URL}/leads/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
             .then((res) => res.json())
             .then((data) => {
 
@@ -37,36 +43,39 @@ function LeadDetails() {
     };
 
     const handleDeleteCustomer = async () => {
-
         if (!selectedCustomer) return;
 
         try {
-
             const response = await fetch(
                 `${import.meta.env.VITE_API_URL}/leads/${selectedCustomer._id}`,
                 {
                     method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
             );
 
             const data = await response.json();
 
             if (!response.ok) {
-
-                throw new Error(data.message);
-
+                toast.error(data.message || "Failed to delete lead");
+                return;
             }
 
-            setIsDeleteModalOpen(false);
+            toast.success("Lead deleted successfully");
 
-            navigate("/customers");
+            setIsDeleteModalOpen(false);
+            setSelectedCustomer(null);
+
+            setTimeout(() => {
+                navigate("/customers");
+            }, 800);
 
         } catch (error) {
-
             console.log(error);
-
+            toast.error("Something went wrong");
         }
-
     };
 
 
@@ -76,36 +85,33 @@ function LeadDetails() {
         try {
 
             const response = await fetch(
-
                 `${import.meta.env.VITE_API_URL}/customers/convert/${lead._id}`,
-
                 {
                     method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
-
             );
 
             const data = await response.json();
 
             if (!response.ok) {
-
                 throw new Error(data.message);
-
             }
+
+            toast.success("Lead Converted Successfully");
 
             setIsConvertModalOpen(false);
 
             navigate("/customers");
 
         } catch (error) {
-
             console.log(error);
-
-            alert(error.message);
-
+            toast.error(error.message);
         }
 
-    };
+    }
 
 
 

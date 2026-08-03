@@ -119,14 +119,16 @@ function AddEmployeeModal({
             value = value.replace(/\D/g, "").slice(0, 10);
 
         }
-
         if (
             name === "fullName" ||
             name === "department" ||
-            name === "designation"
+            name === "designation" ||
+            name === "role"
         ) {
 
             value = value
+                .trim()
+                .replace(/\s+/g, " ")
                 .toLowerCase()
                 .replace(/\b\w/g, (char) => char.toUpperCase());
 
@@ -199,8 +201,6 @@ function AddEmployeeModal({
 
         if (
 
-            !employeeData.employeeId.trim() ||
-
             !employeeData.fullName.trim() ||
 
             !employeeData.mobileNumber.trim() ||
@@ -211,9 +211,9 @@ function AddEmployeeModal({
 
             !employeeData.designation.trim() ||
 
-            !employeeData.joiningDate
+            !employeeData.joiningDate ||
 
-            || !employeeData.dateOfBirth
+            !employeeData.dateOfBirth
 
         ) {
 
@@ -226,6 +226,14 @@ function AddEmployeeModal({
         if (!/\S+@\S+\.\S+/.test(employeeData.email)) {
 
             toast.error("Enter a valid email address.");
+
+            return;
+
+        }
+
+        if (!selectedAadhaar && !employeeData.aadhaarDocument) {
+
+            toast.error("Aadhaar Card is required.");
 
             return;
 
@@ -335,8 +343,6 @@ function AddEmployeeModal({
 
             ...employeeData,
 
-            employeeId: employeeData.employeeId.trim(),
-
             fullName: employeeData.fullName.trim(),
 
             mobileNumber: employeeData.mobileNumber.trim(),
@@ -347,7 +353,10 @@ function AddEmployeeModal({
 
             designation: employeeData.designation.trim(),
 
+            role: employeeData.role.trim(),
+
             dateOfBirth: employeeData.dateOfBirth,
+
             emergencyContactMobile:
                 employeeData.emergencyContactMobile.trim(),
 
@@ -593,29 +602,7 @@ function AddEmployeeModal({
 
                 <div className="grid gap-6 p-8 md:grid-cols-2">
 
-                    <div>
 
-                        <label className="mb-2 block font-semibold">
-
-                            Employee ID *
-
-                        </label>
-
-                        <input
-
-                            type="text"
-
-                            name="employeeId"
-
-                            value={employeeData.employeeId}
-
-                            onChange={handleChange}
-
-                            className="w-full rounded-2xl border border-slate-300 px-5 py-4"
-
-                        />
-
-                    </div>
 
 
 
@@ -763,26 +750,14 @@ function AddEmployeeModal({
                             Role *
 
                         </label>
-
-                        <select
-
+                        <input
+                            type="text"
                             name="role"
-
                             value={employeeData.role}
-
                             onChange={handleChange}
-
+                            placeholder="Enter Role"
                             className="w-full rounded-2xl border border-slate-300 px-5 py-4"
-
-                        >
-
-                            <option>Engineer</option>
-
-                            <option>Manager</option>
-
-                            <option>Admin</option>
-
-                        </select>
+                        />
 
                     </div>
 
