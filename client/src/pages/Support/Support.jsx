@@ -64,7 +64,7 @@ function Support() {
     try {
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/customers`
+        `${import.meta.env.VITE_API_URL}/api/customers`
       );
 
       const data = await response.json();

@@ -52,7 +52,7 @@ function Customers() {
   const getActualCustomers = () => {
     const token = localStorage.getItem("token");
 
-    fetch(`${import.meta.env.VITE_API_URL}/customers`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/customers`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

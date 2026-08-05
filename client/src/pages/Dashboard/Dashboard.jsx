@@ -32,7 +32,7 @@ function Dashboard() {
       setLoading(true);
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/dashboard`
+        `${import.meta.env.VITE_API_URL}/api/dashboard`
       );
 
       if (!response.ok) {
@@ -52,11 +52,11 @@ function Dashboard() {
   useEffect(() => {
     fetchDashboard();
   }, []);
-  
-  if (loading) {
+
+  if (!dashboard) {
     return (
-      <div className="text-lg font-semibold">
-        Loading Dashboard...
+      <div className="text-lg font-semibold text-red-500">
+        Failed to load dashboard
       </div>
     );
   }

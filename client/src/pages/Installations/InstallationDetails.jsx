@@ -75,7 +75,7 @@ function InstallationDetails() {
 
 
     const getCustomers = () => {
-        fetch(`${import.meta.env.VITE_API_URL}/customers`, {
+        fetch(`${import.meta.env.VITE_API_URL}/api/customers`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -85,7 +85,7 @@ function InstallationDetails() {
     };
 
     const getProducts = () => {
-        fetch(`${import.meta.env.VITE_API_URL}/products`, {
+        fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
