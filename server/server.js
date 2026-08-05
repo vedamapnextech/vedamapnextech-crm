@@ -40,7 +40,12 @@ app.use(
   })
 );
 app.use(express.json());
-app.use("/uploads", express.static("uploads"));
+
+
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"))
+);
 app.use("/api/customer-products", customerProductRoutes);
 app.use("/api/dealer-customers", dealerCustomerRoutes);
 app.use("/api/customers", customerRoutes);

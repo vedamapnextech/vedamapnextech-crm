@@ -52,7 +52,7 @@ function CustomerDetails() {
 
 
   const getCustomer = () => {
-    fetch(`${import.meta.env.VITE_API_URL}/customers/${id}`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/customers/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -111,7 +111,7 @@ function CustomerDetails() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/customers/${selectedCustomer._id}`,
+        `${import.meta.env.VITE_API_URL}/api/customers/${selectedCustomer._id}`,
         {
           method: "DELETE",
           headers: {

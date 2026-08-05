@@ -85,7 +85,7 @@ function InstallationDetails() {
     };
 
     const getProducts = () => {
-        fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
+        fetch(`${import.meta.env.VITE_API_URL}/api/leads`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -95,7 +95,7 @@ function InstallationDetails() {
     };
 
     const getDealerCustomers = () => {
-        fetch(`${import.meta.env.VITE_API_URL}/dealer-customers`, {
+        fetch(`${import.meta.env.VITE_API_URL}/api/dealer-customers`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -106,7 +106,7 @@ function InstallationDetails() {
 
 
     const getEmployees = () => {
-        fetch(`${import.meta.env.VITE_API_URL}/employees`, {
+        fetch(`${import.meta.env.VITE_API_URL}/api/employees`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

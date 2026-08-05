@@ -56,8 +56,8 @@ function AddProductModal({
 
         fetch(
             selectedProduct
-                ? `${import.meta.env.VITE_API_URL}/products/${selectedProduct._id}`
-                : `${import.meta.env.VITE_API_URL}/api/products`,
+                ? `${import.meta.env.VITE_API_URL}/api/products/${selectedProduct._id}`
+                : `${import.meta.env.VITE_API_URL}/api/leads`,
             {
                 method: selectedProduct ? "PUT" : "POST",
                 headers: {

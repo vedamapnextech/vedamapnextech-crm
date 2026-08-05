@@ -88,7 +88,7 @@ function AddDealerCustomerModal({
             const token = localStorage.getItem("token");
 
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/dealers`,
+                `${import.meta.env.VITE_API_URL}/api/dealers`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -187,8 +187,8 @@ function AddDealerCustomerModal({
 
         console.log(formData);
         const url = selectedCustomer
-            ? `${import.meta.env.VITE_API_URL}/dealer-customers/${selectedCustomer._id}`
-            : `${import.meta.env.VITE_API_URL}/dealer-customers`;
+            ? `${import.meta.env.VITE_API_URL}/api/dealer-customers/${selectedCustomer._id}`
+            : `${import.meta.env.VITE_API_URL}/api/dealer-customers`;
 
         const method =
 

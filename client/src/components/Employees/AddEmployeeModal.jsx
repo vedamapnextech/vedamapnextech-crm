@@ -125,13 +125,9 @@ function AddEmployeeModal({
             name === "designation" ||
             name === "role"
         ) {
-
             value = value
-                .trim()
-                .replace(/\s+/g, " ")
-                .toLowerCase()
+                .replace(/\s{2,}/g, " ")
                 .replace(/\b\w/g, (char) => char.toUpperCase());
-
         }
 
         setEmployeeData({
@@ -264,7 +260,7 @@ function AddEmployeeModal({
 
             const uploadResponse = await fetch(
 
-                `${import.meta.env.VITE_API_URL}/employees/upload-photo`,
+                `${import.meta.env.VITE_API_URL}/api/employees/upload-photo`,
 
                 {
 
@@ -309,7 +305,7 @@ function AddEmployeeModal({
 
             const uploadResponse = await fetch(
 
-                `${import.meta.env.VITE_API_URL}/employees/upload-aadhaar`,
+                `${import.meta.env.VITE_API_URL}/api/employees/upload-aadhaar`,
 
                 {
                     method: "POST",
@@ -376,9 +372,9 @@ function AddEmployeeModal({
 
             const url = selectedEmployee
 
-                ? `${import.meta.env.VITE_API_URL}/employees/${selectedEmployee._id}`
+                ? `${import.meta.env.VITE_API_URL}/api/employees/${selectedEmployee._id}`
 
-                : `${import.meta.env.VITE_API_URL}/employees`;
+                : `${import.meta.env.VITE_API_URL}/api/employees`;
 
             const method = selectedEmployee ? "PUT" : "POST";
 

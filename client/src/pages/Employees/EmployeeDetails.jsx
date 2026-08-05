@@ -35,7 +35,7 @@ function EmployeeDetails() {
 
             const response = await fetch(
 
-                `${import.meta.env.VITE_API_URL}/employees/${id}`
+                `${import.meta.env.VITE_API_URL}/api/employees/${id}`
 
             );
 
@@ -73,7 +73,7 @@ function EmployeeDetails() {
 
             const response = await fetch(
 
-                `${import.meta.env.VITE_API_URL}/employees/${employee._id}`,
+                `${import.meta.env.VITE_API_URL}/api/employees/${employee._id}`,
 
                 {
                     method: "DELETE",

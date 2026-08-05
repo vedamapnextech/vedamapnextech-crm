@@ -17,7 +17,7 @@ function ProductDetails() {
 
     const getProduct = () => {
 
-        fetch(`${import.meta.env.VITE_API_URL}/products/${id}`)
+        fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`)
             .then((res) => res.json())
             .then((data) => {
 
@@ -35,7 +35,7 @@ function ProductDetails() {
 
         try {
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/products/${product._id}`,
+                `${import.meta.env.VITE_API_URL}/api/products/${product._id}`,
                 {
                     method: "DELETE",
                 }

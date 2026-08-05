@@ -11,7 +11,7 @@ function SupportDetails() {
         try {
 
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/supports/${id}`
+                `${import.meta.env.VITE_API_URL}/api/supports/${id}`
             );
 
             const data = await response.json();

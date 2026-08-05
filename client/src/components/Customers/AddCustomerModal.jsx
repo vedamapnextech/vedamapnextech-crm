@@ -159,7 +159,7 @@ function AddCustomerModal({
 
         const url = selectedCustomer
 
-            ? `${import.meta.env.VITE_API_URL}/customers/${selectedCustomer._id}`
+            ? `${import.meta.env.VITE_API_URL}/api/customers/${selectedCustomer._id}`
 
             : `${import.meta.env.VITE_API_URL}/api/customers`;
 

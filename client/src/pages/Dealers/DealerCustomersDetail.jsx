@@ -37,7 +37,7 @@ function DealerCustomersDetail() {
     try {
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/dealer-customers/customer/${dealerId}`,
+        `${import.meta.env.VITE_API_URL}/api/dealer-customers/customer/${dealerId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -88,7 +88,7 @@ function DealerCustomersDetail() {
   const deleteCustomer = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/dealer-customers/${selectedCustomer._id}`,
+        `${import.meta.env.VITE_API_URL}/api/dealer-customers/${selectedCustomer._id}`,
         {
           method: "DELETE",
           headers: {

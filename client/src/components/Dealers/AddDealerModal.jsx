@@ -66,8 +66,8 @@ function AddDealerModal({
 
             const response = await fetch(
                 selectedDealer
-                    ? `${import.meta.env.VITE_API_URL}/dealers/${selectedDealer._id}`
-                    : `${import.meta.env.VITE_API_URL}/dealers`,
+                    ? `${import.meta.env.VITE_API_URL}/api/dealers/${selectedDealer._id}`
+                    : `${import.meta.env.VITE_API_URL}/api/dealers`,
                 {
                     method: selectedDealer ? "PUT" : "POST",
                     headers: {

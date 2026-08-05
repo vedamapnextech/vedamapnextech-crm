@@ -28,7 +28,7 @@ function LeadDetails() {
 
     const getLead = () => {
 
-        fetch(`${import.meta.env.VITE_API_URL}/leads/${id}`, {
+        fetch(`${import.meta.env.VITE_API_URL}/api/leads/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -47,7 +47,7 @@ function LeadDetails() {
 
         try {
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/leads/${selectedCustomer._id}`,
+                `${import.meta.env.VITE_API_URL}/api/leads/${selectedCustomer._id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -85,7 +85,7 @@ function LeadDetails() {
         try {
 
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/customers/convert/${lead._id}`,
+                `${import.meta.env.VITE_API_URL}/api/customers/convert/${lead._id}`,
                 {
                     method: "POST",
                     headers: {

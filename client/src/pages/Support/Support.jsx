@@ -41,7 +41,7 @@ function Support() {
     try {
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/supports`
+        `${import.meta.env.VITE_API_URL}/api/supports`
       );
 
       const data = await response.json();
@@ -93,7 +93,7 @@ function Support() {
     try {
 
       await fetch(
-        `${import.meta.env.VITE_API_URL}/supports/${selectedSupport._id}`,
+        `${import.meta.env.VITE_API_URL}/api/supports/${selectedSupport._id}`,
         {
           method: "DELETE",
         }

@@ -35,7 +35,7 @@ function CustomersList() {
     ) => {
 
         fetch(
-            `${import.meta.env.VITE_API_URL}/customers?search=${searchText}&status=${statusText}&city=${cityText}`,
+            `${import.meta.env.VITE_API_URL}/api/customers?search=${searchText}&status=${statusText}&city=${cityText}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -63,7 +63,7 @@ function CustomersList() {
 
         try {
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/customers/${selectedCustomer._id}`,
+                `${import.meta.env.VITE_API_URL}/api/customers/${selectedCustomer._id}`,
                 {
                     method: "DELETE",
                     headers: {

@@ -161,7 +161,7 @@ const Navbar = () => {
         setLoading(true);
 
         const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/search?query=${search}`
+          `${import.meta.env.VITE_API_URL}/api/search?query=${search}`
         );
 
         setResults(res.data);

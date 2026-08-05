@@ -86,8 +86,8 @@ function AddLeadModal({
         }
 
         const url = selectedCustomer
-            ? `${import.meta.env.VITE_API_URL}/leads/${selectedCustomer._id}`
-            : `${import.meta.env.VITE_API_URL}/leads`;
+            ? `${import.meta.env.VITE_API_URL}/api/leads/${selectedCustomer._id}`
+            : `${import.meta.env.VITE_API_URL}/api/leads`;
 
         const method = selectedCustomer ? "PUT" : "POST";
 

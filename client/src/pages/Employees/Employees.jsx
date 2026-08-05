@@ -42,7 +42,7 @@ function Employees() {
 
     setLoading(true);
 
-    fetch(`${import.meta.env.VITE_API_URL}/employees`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/employees`)
       .then((res) => res.json())
       .then((data) => {
 
@@ -68,7 +68,7 @@ function Employees() {
   const handleDelete = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/employees/${selectedEmployee._id}`,
+        `${import.meta.env.VITE_API_URL}/api/employees/${selectedEmployee._id}`,
         {
           method: "DELETE",
         }

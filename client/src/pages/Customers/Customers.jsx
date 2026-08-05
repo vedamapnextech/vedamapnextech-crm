@@ -32,7 +32,7 @@ function Customers() {
     const token = localStorage.getItem("token");
     console.log(import.meta.env.VITE_API_URL);
     fetch(
-      `${import.meta.env.VITE_API_URL}/leads?search=${searchText}&status=${statusText}&city=${cityText}`,
+      `${import.meta.env.VITE_API_URL}/api/leads?search=${searchText}&status=${statusText}&city=${cityText}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -72,7 +72,7 @@ function Customers() {
 
       const response = await fetch(
 
-        `${import.meta.env.VITE_API_URL}/leads/${selectedCustomer._id}`,
+        `${import.meta.env.VITE_API_URL}/api/leads/${selectedCustomer._id}`,
 
 
         {

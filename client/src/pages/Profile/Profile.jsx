@@ -43,7 +43,7 @@ function Profile() {
     const fetchProfile = async () => {
         try {
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/auth/profile`,
+                `${import.meta.env.VITE_API_URL}/api/auth/profile`,
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -93,7 +93,7 @@ function Profile() {
             }
 
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/auth/profile`,
+                `${import.meta.env.VITE_API_URL}/api/auth/profile`,
                 {
                     method: "PUT",
                     headers: {

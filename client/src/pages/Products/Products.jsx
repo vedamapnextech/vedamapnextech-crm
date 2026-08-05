@@ -58,7 +58,7 @@ function Products() {
       setLoading(true);
     }
 
-    fetch(`${import.meta.env.VITE_API_URL}/api/products`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/leads`)
       .then((res) => res.json())
       .then((data) => {
 
@@ -84,7 +84,7 @@ function Products() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/products/${selectedProduct._id}`,
+        `${import.meta.env.VITE_API_URL}/api/products/${selectedProduct._id}`,
         {
           method: "DELETE",
         }

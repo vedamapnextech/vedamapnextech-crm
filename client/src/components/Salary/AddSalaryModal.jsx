@@ -252,8 +252,8 @@ function AddSalaryModal({
             const response = await fetch(
 
                 editMode
-                    ? `${import.meta.env.VITE_API_URL}/salary/${salary._id}`
-                    : `${import.meta.env.VITE_API_URL}/salary`,
+                    ? `${import.meta.env.VITE_API_URL}/api/salary/${salary._id}`
+                    : `${import.meta.env.VITE_API_URL}/api/salary`,
 
                 {
 

@@ -77,7 +77,7 @@ function Salary() {
         try {
 
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/employees/${id}`
+                `${import.meta.env.VITE_API_URL}/api/employees/${id}`
             );
 
             const data = await response.json();
@@ -103,7 +103,7 @@ function Salary() {
         try {
 
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/salary/${id}`
+                `${import.meta.env.VITE_API_URL}/api/salary/${id}`
             );
 
             const data = await response.json();
@@ -124,7 +124,7 @@ function Salary() {
 
             const response = await fetch(
 
-                `${import.meta.env.VITE_API_URL}/salary/${selectedSalary._id}`,
+                `${import.meta.env.VITE_API_URL}/api/salary/${selectedSalary._id}`,
 
                 {
                     method: "DELETE",

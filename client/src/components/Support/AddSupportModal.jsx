@@ -97,8 +97,8 @@ function AddSupportModal({
 
             const response = await fetch(
                 selectedSupport
-                    ? `${import.meta.env.VITE_API_URL}/supports/${selectedSupport._id}`
-                    : `${import.meta.env.VITE_API_URL}/supports`,
+                    ? `${import.meta.env.VITE_API_URL}/api/supports/${selectedSupport._id}`
+                    : `${import.meta.env.VITE_API_URL}/api/supports`,
                 {
                     method: selectedSupport ? "PUT" : "POST",
 
