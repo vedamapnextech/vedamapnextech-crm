@@ -218,7 +218,7 @@ function AddInstallationModal({
         try {
 
             const url = selectedInstallation
-                ? `${import.meta.env.VITE_API_URL}/installations/${selectedInstallation._id}`
+                ? `${import.meta.env.VITE_API_URL}/api/installations/${selectedInstallation._id}`
                 : `${import.meta.env.VITE_API_URL}/api/installations`;
 
             const method = selectedInstallation ? "PUT" : "POST";

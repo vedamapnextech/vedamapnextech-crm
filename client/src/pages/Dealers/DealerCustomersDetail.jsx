@@ -68,7 +68,7 @@ function DealerCustomersDetail() {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/customer-products/${dealerId}`,
+        `${import.meta.env.VITE_API_URL}/api/customer-products/${dealerId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

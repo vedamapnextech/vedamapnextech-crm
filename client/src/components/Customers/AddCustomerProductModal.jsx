@@ -145,9 +145,9 @@ function AddCustomerProductModal({
 
         const url = selectedProduct
 
-            ? `${import.meta.env.VITE_API_URL}/customer-products/${selectedProduct._id}`
+            ? `${import.meta.env.VITE_API_URL}/api/customer-products/${selectedProduct._id}`
 
-            : `${import.meta.env.VITE_API_URL}/customer-products`;
+            : `${import.meta.env.VITE_API_URL}/`;
 
         const method =
 

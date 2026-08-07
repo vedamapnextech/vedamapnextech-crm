@@ -133,17 +133,8 @@ const updateProfile = async (req, res) => {
 
         if (req.file) {
 
-            // Purani image delete karo
-            if (user.profileImage) {
 
-                const oldImagePath = path.join(__dirname, "..", user.profileImage);
-
-                if (fs.existsSync(oldImagePath)) {
-                    fs.unlinkSync(oldImagePath);
-                }
-            }
-
-            user.profileImage = `/uploads/users/${req.file.filename}`;
+            user.profileImage = req.file.path;
         }
 
         await user.save();
@@ -237,7 +228,7 @@ const sendEmailOtp = async (req, res) => {
 
         const user = await User.findById(req.user._id);
 
-       
+
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
@@ -298,7 +289,7 @@ const sendEmailOtp = async (req, res) => {
         </div>
     `,
         });
-     
+
         return res.status(200).json({
             success: true,
             message: "OTP generated successfully",

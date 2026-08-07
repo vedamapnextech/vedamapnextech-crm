@@ -45,7 +45,7 @@ function InstallationDetails() {
 
         try {
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/installations/${installation._id}`,
+                `${import.meta.env.VITE_API_URL}/api/installations/${installation._id}`,
                 {
                     method: "DELETE",
                 }
@@ -123,7 +123,7 @@ function InstallationDetails() {
     const getOtherInstallations = async (wbCode) => {
         try {
             const res = await fetch(
-                `${import.meta.env.VITE_API_URL}/installations/wb/${wbCode}`
+                `${import.meta.env.VITE_API_URL}/api/installations/wb/${wbCode}`
             );
 
             const data = await res.json();
@@ -142,7 +142,7 @@ function InstallationDetails() {
 
 
     useEffect(() => {
-        fetch(`${import.meta.env.VITE_API_URL}/installations/${id}`, {
+        fetch(`${import.meta.env.VITE_API_URL}/api/installations/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -613,7 +613,7 @@ function InstallationDetails() {
 
                     getInstallations={async () => {
                         const res = await fetch(
-                            `${import.meta.env.VITE_API_URL}/installations/${id}`
+                            `${import.meta.env.VITE_API_URL}/api/installations/${id}`
                         );
 
                         const data = await res.json();

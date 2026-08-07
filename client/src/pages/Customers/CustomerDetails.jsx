@@ -22,7 +22,7 @@ function CustomerDetails() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/customer-products/${selectedProduct._id}`,
+        `${import.meta.env.VITE_API_URL}/api/customer-products/${selectedProduct._id}`,
         {
           method: "DELETE",
           headers: {
@@ -70,7 +70,7 @@ function CustomerDetails() {
   const getInstallations = () => {
 
     fetch(
-      `${import.meta.env.VITE_API_URL}/installations/customer/${id}`,
+       `${import.meta.env.VITE_API_URL}/api/installations/customer/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -89,7 +89,7 @@ function CustomerDetails() {
   const getProducts = () => {
 
     fetch(
-      `${import.meta.env.VITE_API_URL}/customer-products/${id}`,
+      `${import.meta.env.VITE_API_URL}/api/customer-products/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

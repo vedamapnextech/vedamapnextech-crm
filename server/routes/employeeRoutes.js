@@ -32,9 +32,7 @@ router.post(
         }
 
         res.json({
-
-            imageUrl: `/uploads/employees/${req.file.filename}`,
-
+            imageUrl: req.file.path,
         });
 
     }
@@ -53,11 +51,8 @@ router.post(
             });
 
         }
-
         res.json({
-
-            documentUrl: `/uploads/employees/${req.file.filename}`,
-
+            documentUrl: req.file.path,
         });
 
     }
