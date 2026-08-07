@@ -66,7 +66,15 @@ function AddProductModal({
                 body: JSON.stringify(productData),
             }
         )
-            .then((res) => res.json())
+            .then(async (res) => {
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.message || "Product Save Failed");
+                }
+
+                return data;
+            })
             .then((data) => {
 
                 console.log(data);
