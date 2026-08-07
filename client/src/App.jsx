@@ -58,7 +58,7 @@ function App() {
         <Route
           path="/dealer/:dealerId/customers/:customerId"
           element={<DealerCustomersDetail />}
-        />X
+        />
         <Route path="/customer/:id" element={<CustomerDetails />} />
         <Route path="/dealers" element={<Dealers />} />
         <Route path="/leads/:id" element={<LeadDetails />} />
