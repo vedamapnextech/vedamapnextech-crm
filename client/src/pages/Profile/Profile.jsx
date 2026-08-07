@@ -67,7 +67,11 @@ function Profile() {
 
             setPreviewImage(
                 data.user.profileImage
-                    ? `${import.meta.env.VITE_API_URL.replace("/api", "")}${data.user.profileImage}`
+                    ? (
+                        data.user.profileImage.startsWith("http")
+                            ? data.user.profileImage
+                            : `${import.meta.env.VITE_API_URL.replace("/api", "")}${data.user.profileImage}`
+                    )
                     : ""
             );
         } catch (error) {
@@ -172,69 +176,73 @@ function Profile() {
 
                 {/* Header */}
 
-             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
 
-    {/* Left Side */}
-    <div className="flex items-center gap-6">
+                    {/* Left Side */}
+                    <div className="flex items-center gap-6">
 
-        <div className="h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-white shadow-xl">
+                        <div className="h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-white shadow-xl">
 
-            {user?.profileImage ? (
-                <img
-                    src={`${import.meta.env.VITE_API_URL.replace("/api", "")}${user.profileImage}`}
-                    alt="Profile"
-                    className="h-full w-full object-cover"
-                />
-            ) : (
-                <div className="flex h-full w-full items-center justify-center text-5xl font-bold text-cyan-600">
-                    {user?.name?.charAt(0).toUpperCase()}
+                            {user?.profileImage ? (
+                                <img
+                                    src={
+                                        user.profileImage.startsWith("http")
+                                            ? user.profileImage
+                                            : `${import.meta.env.VITE_API_URL.replace("/api", "")}${user.profileImage}`
+                                    }
+                                    alt="Profile"
+                                    className="h-full w-full object-cover"
+                                />
+                            ) : (
+                                <div className="flex h-full w-full items-center justify-center text-5xl font-bold text-cyan-600">
+                                    {user?.name?.charAt(0).toUpperCase()}
+                                </div>
+                            )}
+
+                        </div>
+
+                        <div>
+                            <h1 className="text-4xl font-bold text-slate-800">
+                                {user?.name}
+                            </h1>
+
+                            <p className="mt-2 text-lg text-slate-500">
+                                {user?.email}
+                            </p>
+                        </div>
+
+                    </div>
+
+                    {/* Right Side Buttons */}
+                    <div className="flex items-center gap-3">
+
+                        <button
+                            onClick={() => setShowEditModal(true)}
+                            className="flex items-center gap-2 rounded-xl bg-cyan-600 px-5 py-3 text-white font-semibold shadow-md transition hover:bg-cyan-700"
+                        >
+                            <HiOutlinePencilAlt size={18} />
+                            Edit
+                        </button>
+
+                        <button
+                            onClick={() => navigate("/change-password")}
+                            className="flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-white font-semibold shadow-md transition hover:bg-black"
+                        >
+                            <HiOutlineKey size={18} />
+                            Password
+                        </button>
+
+                        <button
+                            onClick={() => setShowEmailModal(true)}
+                            className="flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-white font-semibold shadow-md transition hover:bg-emerald-700"
+                        >
+                            <HiOutlineMail size={18} />
+                            Email
+                        </button>
+
+                    </div>
+
                 </div>
-            )}
-
-        </div>
-
-        <div>
-            <h1 className="text-4xl font-bold text-slate-800">
-                {user?.name}
-            </h1>
-
-            <p className="mt-2 text-lg text-slate-500">
-                {user?.email}
-            </p>
-        </div>
-
-    </div>
-
-    {/* Right Side Buttons */}
-    <div className="flex items-center gap-3">
-
-        <button
-            onClick={() => setShowEditModal(true)}
-            className="flex items-center gap-2 rounded-xl bg-cyan-600 px-5 py-3 text-white font-semibold shadow-md transition hover:bg-cyan-700"
-        >
-            <HiOutlinePencilAlt size={18} />
-            Edit
-        </button>
-
-        <button
-            onClick={() => navigate("/change-password")}
-            className="flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-white font-semibold shadow-md transition hover:bg-black"
-        >
-            <HiOutlineKey size={18} />
-            Password
-        </button>
-
-        <button
-            onClick={() => setShowEmailModal(true)}
-            className="flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-white font-semibold shadow-md transition hover:bg-emerald-700"
-        >
-            <HiOutlineMail size={18} />
-            Email
-        </button>
-
-    </div>
-
-</div>
 
                 {/* Details */}
 
@@ -541,7 +549,11 @@ function Profile() {
 
                                     setPreviewImage(
                                         user.profileImage
-                                            ? `${import.meta.env.VITE_API_URL}${user.profileImage}`
+                                            ? (
+                                                user.profileImage.startsWith("http")
+                                                    ? user.profileImage
+                                                    : `${import.meta.env.VITE_API_URL.replace("/api", "")}${user.profileImage}`
+                                            )
                                             : ""
                                     );
                                 }}

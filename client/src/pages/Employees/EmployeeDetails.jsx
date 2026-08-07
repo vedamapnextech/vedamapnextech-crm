@@ -165,7 +165,9 @@ function EmployeeDetails() {
                         <img
                             src={
                                 employee.profilePhoto
-                                    ? `${import.meta.env.VITE_API_URL.replace("/api", "")}${employee.profilePhoto}`
+                                    ? employee.profilePhoto.startsWith("http")
+                                        ? employee.profilePhoto
+                                        : `${import.meta.env.VITE_API_URL.replace("/api", "")}${employee.profilePhoto}`
                                     : "https://ui-avatars.com/api/?name=Employee&background=10B981&color=fff"
                             }
                             alt={employee.fullName}
@@ -177,7 +179,9 @@ function EmployeeDetails() {
                                 setPreviewTitle("Profile Photo");
 
                                 setPreviewFile(
-                                    `${import.meta.env.VITE_API_URL.replace("/api", "")}${employee.profilePhoto}`
+                                    employee.profilePhoto.startsWith("http")
+                                        ? employee.profilePhoto
+                                        : `${import.meta.env.VITE_API_URL.replace("/api", "")}${employee.profilePhoto}`
                                 );
 
                                 setOpenPreview(true);
@@ -428,9 +432,10 @@ function EmployeeDetails() {
                                     <button
                                         onClick={() => {
                                             setPreviewTitle("Aadhaar Card");
-
                                             setPreviewFile(
-                                                `${import.meta.env.VITE_API_URL.replace("/api", "")}${employee.aadhaarDocument}`
+                                                employee.aadhaarDocument.startsWith("http")
+                                                    ? employee.aadhaarDocument
+                                                    : `${import.meta.env.VITE_API_URL.replace("/api", "")}${employee.aadhaarDocument}`
                                             );
 
                                             setOpenPreview(true);
@@ -443,8 +448,9 @@ function EmployeeDetails() {
                                     <button
                                         onClick={async () => {
                                             const fileUrl =
-                                                `${import.meta.env.VITE_API_URL.replace("/api", "")}${employee.aadhaarDocument}`;
-
+                                                employee.aadhaarDocument.startsWith("http")
+                                                    ? employee.aadhaarDocument
+                                                    : `${import.meta.env.VITE_API_URL.replace("/api", "")}${employee.aadhaarDocument}`;
                                             const response = await fetch(fileUrl);
 
                                             const blob = await response.blob();

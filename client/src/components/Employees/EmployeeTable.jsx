@@ -110,10 +110,10 @@ function EmployeeTable({
                                         <img
                                             src={
                                                 employee.profilePhoto
-                                                    ? `${import.meta.env.VITE_API_URL.replace("/api", "")}${employee.profilePhoto}`
-                                                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                                        employee.fullName
-                                                    )}&background=10B981&color=fff`
+                                                    ? employee.profilePhoto.startsWith("http")
+                                                        ? employee.profilePhoto
+                                                        : `${import.meta.env.VITE_API_URL.replace("/api", "")}${employee.profilePhoto}`
+                                                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(employee.fullName)}&background=10B981&color=fff`
                                             }
                                             alt={employee.fullName}
                                             className="h-14 w-14 min-h-14 min-w-14 rounded-full border-2 border-emerald-500 bg-slate-100 object-cover shadow-md"
