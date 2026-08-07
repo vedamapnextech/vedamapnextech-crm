@@ -218,7 +218,9 @@ function AddCustomerProductModal({
             );
 
         }
-
+        console.log("PRODUCT SAVE CLICK");
+        console.log(formData);
+        debugger;
     };
 
     return (
