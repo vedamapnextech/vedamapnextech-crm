@@ -123,6 +123,10 @@ function AddCustomerProductModal({
     };
 
 
+
+
+
+
     const handleSubmit = async () => {
 
         if (
@@ -147,7 +151,7 @@ function AddCustomerProductModal({
 
             ? `${import.meta.env.VITE_API_URL}/api/customer-products/${selectedProduct._id}`
 
-            : `${import.meta.env.VITE_API_URL}/`;
+            : `${import.meta.env.VITE_API_URL}/api/customer-products`;
 
         const method =
 
@@ -158,6 +162,10 @@ function AddCustomerProductModal({
                 : "POST";
 
         try {
+
+            console.log("URL =", url);
+            console.log("Method =", method);
+            console.log("FormData =", formData);
 
             const response = await fetch(
 
