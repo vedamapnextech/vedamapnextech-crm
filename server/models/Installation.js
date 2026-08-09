@@ -17,9 +17,14 @@ const installationSchema = new mongoose.Schema(
     product: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
-      required: true,
+      required: false,
     },
 
+    productName: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     wbCode: {
       type: String,
       required: true,

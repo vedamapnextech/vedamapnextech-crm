@@ -155,7 +155,7 @@ function Installations() {
 
     const token = localStorage.getItem("token");
 
-    fetch(`${import.meta.env.VITE_API_URL}/api/leads`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -163,12 +163,12 @@ function Installations() {
       .then((res) => res.json())
       .then((data) => {
 
-        console.log("Products :", data);
+        console.log("🔥 PRODUCTS FROM API =", data);
+        console.log("🔥 PRODUCTS LENGTH =", data?.length);
 
-        setProducts(data);
+        setProducts(Array.isArray(data) ? data : []);
 
       });
-
   };
 
 
@@ -206,6 +206,13 @@ function Installations() {
 
   }, []);
 
+  const handleClearFilters = () => {
+    setSearch("");
+    setCustomerFilter("");
+    setStatusFilter("All");
+    setWbFilter("ALL");
+    setShowExportMenu(false);
+  };
   const filteredInstallations = installations.filter((installation) => {
 
     const searchText = search.toLowerCase();
@@ -355,20 +362,6 @@ function Installations() {
             </div>
           )}
 
-          {(search || customerFilter || statusFilter !== "All") && (
-
-            <button
-              onClick={() => {
-                setSearch("");
-                setCustomerFilter("");
-                setStatusFilter("All");
-              }}
-              className="rounded-2xl bg-slate-200 px-6 py-3 font-semibold hover:bg-slate-300 transition"
-            >
-              Clear Filters
-            </button>
-
-          )}
 
         </div>
 
@@ -381,6 +374,7 @@ function Installations() {
         setOpenModal={setOpenModal}
         setSelectedInstallation={setSelectedInstallation}
         setOpenDeleteModal={setOpenDeleteModal}
+        setStatusFilter={setStatusFilter}
       />
       {openModal && (
         <AddInstallationModal

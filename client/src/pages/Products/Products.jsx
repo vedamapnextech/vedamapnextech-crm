@@ -58,9 +58,11 @@ function Products() {
       setLoading(true);
     }
 
-    fetch(`${import.meta.env.VITE_API_URL}/api/leads`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/products`)
       .then((res) => res.json())
       .then((data) => {
+
+        console.log("PRODUCTS API RESPONSE =", data);
 
         setProducts(data);
 
@@ -76,7 +78,6 @@ function Products() {
       });
 
   };
-
 
 
   const handleDeleteProduct = async () => {

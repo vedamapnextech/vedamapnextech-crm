@@ -13,6 +13,7 @@ function InstallationTable({
     setOpenModal,
     setSelectedInstallation,
     setOpenDeleteModal,
+    setStatusFilter
 }) {
     const navigate = useNavigate();
     const [search, setSearch] = useState("");
@@ -99,10 +100,9 @@ function InstallationTable({
 
                 <button
                     onClick={() => {
-
                         setSearch("");
                         setSelectedEngineer("");
-
+                        setStatusFilter("All");
                     }}
                     className="
 flex items-center

@@ -383,7 +383,7 @@ function AddInstallationModal({
                             <label className="mb-2 block text-sm font-semibold text-slate-700">
                                 Product <span className="text-red-500">*</span>
                             </label>
-                            <Select
+                            <CreatableSelect
                                 options={products.map((product) => ({
                                     value: product._id,
                                     label: product.name,
@@ -397,7 +397,15 @@ function AddInstallationModal({
                                         }))
                                         .find(
                                             (option) => option.value === installationData.product
-                                        ) || null
+                                        ) ||
+                                    (
+                                        installationData.product
+                                            ? {
+                                                value: installationData.product,
+                                                label: installationData.product,
+                                            }
+                                            : null
+                                    )
                                 }
 
                                 onChange={(selectedOption) =>
@@ -407,10 +415,9 @@ function AddInstallationModal({
                                     })
                                 }
 
-                                placeholder="Select Product"
-
+                                placeholder="Select Product or type manually"
                                 isSearchable
-
+                                isClearable
                                 className="text-sm"
                             />
 
