@@ -170,7 +170,7 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
 
 
 
-        <NavLink
+        {/* <NavLink
           to="/settings"
           className={`${menuStyle} ${isSidebarOpen ? "justify-start" : "justify-center"}`}
         >
@@ -180,7 +180,7 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
             <span className="text-[17px]">Settings</span>
           )}
 
-        </NavLink>
+        </NavLink> */}
 
       </nav>
 
