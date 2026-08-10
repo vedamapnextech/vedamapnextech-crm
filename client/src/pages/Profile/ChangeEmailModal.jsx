@@ -36,10 +36,8 @@ function ChangeEmailModal({
         try {
             setLoading(true);
 
-          
-
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/auth/send-email-otp`,
+                `${import.meta.env.VITE_API_URL}/api/auth/send-email-otp`,
                 {
                     method: "PUT",
                     headers: {
@@ -56,20 +54,25 @@ function ChangeEmailModal({
             const data = await response.json();
 
             if (!response.ok) {
-                toast.error(data.message);
-                return;
+                throw new Error(
+                    data.message || "Failed to send OTP"
+                );
             }
 
-            toast.success(data.message);
+            console.log("SEND OTP RESPONSE:", data);
+
+            toast.success(data.message || "OTP sent successfully");
 
             setStep(2);
+
         } catch (error) {
-            toast.error("Something went wrong");
+            console.error("SEND OTP ERROR:", error);
+            toast.error(error.message || "Something went wrong");
+
         } finally {
             setLoading(false);
         }
     };
-
     const verifyOtp = async () => {
         if (!formData.otp) {
             toast.error("Enter OTP");
@@ -80,7 +83,7 @@ function ChangeEmailModal({
             setLoading(true);
 
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/auth/verify-email-otp`,
+                `${import.meta.env.VITE_API_URL}/api/auth/verify-email-otp`,
                 {
                     method: "PUT",
                     headers: {
@@ -146,7 +149,7 @@ function ChangeEmailModal({
 
                 {step === 1 && (
                     <>
-                        
+
                         <input
                             type="email"
                             name="newEmail"

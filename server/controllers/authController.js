@@ -196,14 +196,13 @@ const changePassword = async (req, res) => {
         });
 
     } catch (error) {
-
-        console.log(error);
+        console.error("EMAIL OTP ERROR =", error);
+        console.error("EMAIL OTP ERROR MESSAGE =", error.message);
 
         return res.status(500).json({
             success: false,
-            message: "Internal Server Error",
+            message: error.message || "Email Sending Failed",
         });
-
     }
 };
 
@@ -297,14 +296,16 @@ const sendEmailOtp = async (req, res) => {
         });
 
     } catch (error) {
-
-        console.log(error);
+        console.error("========== SEND EMAIL OTP ERROR ==========");
+        console.error(error);
+        console.error("MESSAGE:", error.message);
+        console.error("STACK:", error.stack);
+        console.error("==========================================");
 
         return res.status(500).json({
             success: false,
-            message: "Internal Server Error",
+            message: error.message || "Internal Server Error",
         });
-
     }
 
 };
