@@ -1,18 +1,21 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: process.env.BREVO_SMTP_HOST,
+    port: Number(process.env.BREVO_SMTP_PORT),
+    secure: false,
+
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.BREVO_SMTP_USER,
+        pass: process.env.BREVO_SMTP_PASS,
     },
 });
 
 transporter.verify((error, success) => {
     if (error) {
-        console.error("❌ EMAIL CONFIG ERROR:", error);
+        console.error("❌ BREVO EMAIL CONFIG ERROR:", error);
     } else {
-        console.log("✅ EMAIL SERVER READY");
+        console.log("✅ BREVO EMAIL SERVER READY");
     }
 });
 

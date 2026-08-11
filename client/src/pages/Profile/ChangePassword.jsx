@@ -45,7 +45,7 @@ function ChangePassword() {
             setLoading(true);
 
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/auth/change-password`,
+                `${import.meta.env.VITE_API_URL}/api/auth/change-password`,
                 {
                     method: "PUT",
                     headers: {
@@ -58,7 +58,6 @@ function ChangePassword() {
                     }),
                 }
             );
-
             const data = await response.json();
 
             if (!response.ok) {

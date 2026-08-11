@@ -256,7 +256,7 @@ const sendEmailOtp = async (req, res) => {
 
         await user.save();
         await transporter.sendMail({
-            from: process.env.EMAIL_USER,
+            from: process.env.EMAIL_FROM,
             to: user.email,
             subject: "JobTrack CRM - Email Verification OTP",
             html: `
@@ -386,7 +386,7 @@ const verifyEmailOtp = async (req, res) => {
 const testEmail = async (req, res) => {
     try {
         await transporter.sendMail({
-            from: process.env.EMAIL_USER,
+            from: process.env.EMAIL_FROM,
             to: process.env.EMAIL_USER,
             subject: "JobTrack CRM - Test Email",
             html: `
@@ -444,7 +444,7 @@ const forgotPassword = async (req, res) => {
         await user.save();
 
         await transporter.sendMail({
-            from: process.env.EMAIL_USER,
+            from: process.env.EMAIL_FROM,
             to: user.email,
             subject: "Reset Your Password - JobTrack CRM",
             html: `
