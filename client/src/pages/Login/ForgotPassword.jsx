@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 function ForgotPassword() {
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
-
+    const navigate = useNavigate();
     const handleForgotPassword = async () => {
         if (!email.trim()) {
             return toast.error("Please enter your email");
@@ -66,6 +67,14 @@ function ForgotPassword() {
                     className="w-full bg-cyan-600 text-white py-3 rounded-lg"
                 >
                     {loading ? "Sending..." : "Send Reset Link"}
+                </button>
+
+                <button
+                    type="button"
+                    onClick={() => navigate("/login")}
+                    className="w-full mt-4 border border-slate-300 text-slate-700 py-3 rounded-lg font-semibold hover:bg-slate-100 transition"
+                >
+                    ← Back to Login
                 </button>
 
             </div>

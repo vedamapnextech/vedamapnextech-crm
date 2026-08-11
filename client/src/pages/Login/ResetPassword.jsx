@@ -10,6 +10,7 @@ function ResetPassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+ 
   const handleResetPassword = async () => {
 
     if (!password || !confirmPassword) {
@@ -48,6 +49,7 @@ function ResetPassword() {
       }
 
       toast.success(data.message);
+
 
       navigate("/login");
 
@@ -97,6 +99,14 @@ function ResetPassword() {
           className="w-full bg-cyan-600 text-white py-3 rounded-lg"
         >
           {loading ? "Updating..." : "Reset Password"}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => navigate("/login")}
+          className="w-full mt-4 border border-slate-300 text-slate-700 py-3 rounded-lg font-semibold hover:bg-slate-100 transition"
+        >
+          ← Back to Login
         </button>
 
       </div>

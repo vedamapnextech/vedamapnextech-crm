@@ -54,10 +54,6 @@ function Login() {
         }
       );
 
-
-
-
-
       const data = await response.json();
 
       if (!response.ok) {
