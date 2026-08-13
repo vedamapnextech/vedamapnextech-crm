@@ -95,7 +95,7 @@ function Dashboard() {
       value: dashboard.totalDealerCustomers,
       icon: <HiOutlineBuildingStorefront />,
       color: "from-orange-500 to-amber-500",
-      path: "/dealer-customers",
+      path: "/dealers",
     },
     {
       title: "Total Leads",

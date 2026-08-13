@@ -218,13 +218,12 @@ function Support() {
           className="
       group
       rounded-3xl
-      bg-white
+       bg-white
       p-6
       shadow-lg
       border border-slate-200
       transition-all
-      duration-300
-      hover:-translate-y-2
+      duration-300hover:-translate-y-2
       hover:shadow-2xl
       hover:border-yellow-400
       cursor-pointer
